@@ -41,17 +41,6 @@
 <body>
     <h1>Mathematical Background</h1>
 
-    <h2>Introduction</h2>
-    <p>
-        The <i>Parallel Full Approximation Scheme in Space and Time</i> (<b>PFASST</b>) is a <i>Parallel-in-Time</i> method for solving <i>Partial Differential Equations</i> (<b>PDE</b>s).
-    </p>
-
-    <p>
-        It was first introduced by Matthew Emmet and Michael L. Minion in their 2012 paper <a href="https://msp.org/camcos/2012/7-1/p04.xhtml"><cite>Toward an efficient parallel in time method for partial differential equations</cite></a>.
-        <i>PFASST</i> combines aspects of the Pareal method with Spectral Deferred Correction and the Full-Approximation Scheme.
-    </p>
-
-
     <h2>Deferred Correction</h2>
     <p>
         Deferred Correction is a method to obtain higher-order solutions for an initial value problem by iterating and refining an initial approximation.
@@ -72,7 +61,7 @@
 
     <p>
         Using an interpolation scheme, we can find a continous approximation $\tilde{u}_{0}$ for all $t \in \left[ 0; T\right]$, e.g.
-        using a Lagrangian interpolation.
+        using a Lagrangian interpolation polynomial.
     </p>
 
     <p>
@@ -109,29 +98,60 @@
     $$
 
     <p>
-        As we are given the exact solution $U_0$ at $t=0$, we have $e(0) = 0$.
-        Therefore, we have found a new IVP that we can solve using a time stepping method.
+        As we are given the exact solution $u(0) = U_0$ at $t=0$, we have $e(0) = 0$.
+        This provides as with an initial value and we have found a new IVP that we can solve using a time stepping method.
         Iteratively, we can improve our initial guess of $u(t)$ to achieve higher-order solutions $\tilde{u}_{j}(t)$.
     </p>
 
+
     <!-- TODO: hier noch mehr, vlt interaktives plot dings -->
 
+    <p>
+        The Deferred Correction method has multiple shortcomings, namely:
+        <ul>
+            <li>Computing the derivative for the error ODE can lead to numerical instabilities.</li>
+            <li>Interpolation on equvidistant grid points may lead to the Runge-effect.</li>
+        </ul>
+    </p>
 
 
     <h2>Spectral Deferred Correction</h2>
 
-    The Deferred Correction method has multiple shortcomings, namely
-    <ul>
-        <li>Derivative of interpolant may be sensitive to round-off errors</li>
-        <li>Equvidistant grid points can lead to the Runge-effect in the interpolant $\tilde{u}_{0}(t)$</li>
-    </ul>
+    <p>
+        Spectral Deferred Correction tries to solve the shortcomings of classical Deferred Correction by:
+        <ul>
+            <li>Reformulating the error equation using the residual to replace the derivative with integrals.</li>
+            <li>Using spectral integration to compute these integrals.</li>
+            <li>Replacing equvidistant time stepping points with quadrature nodes to improve the method's robustness.</li>
+        </ul>
+    </p>
 
 
     <h2>Full Approximation Scheme</h2>
 
     <h2>Parallel-in-Time Methods and Parareal</h2>
 
+    <p>
+        Traditionally, solvers use spatial paralellism to speed up the computation.
+        However, this type of paralellism does not scale infinitely and at some points, the cost of parallelization may become to high.
+    </p>
+
+    <p>
+        To bypass this problem, there has been ongoing efforts to exploit parallelization in the time domain.
+        See <a href="https://parallel-in-time.org/">here</a> for an overview over existing methods and publications.
+    </p>
+
+
     <h2>PFASST</h2>
+
+    <p>
+        The <i>Parallel Full Approximation Scheme in Space and Time</i> (<b>PFASST</b>) is a <i>Parallel-in-Time</i> method for solving <i>Partial Differential Equations</i> (<b>PDE</b>s).
+    </p>
+
+    <p>
+        It was first introduced by Matthew Emmet and Michael L. Minion in their 2012 paper <a href="https://msp.org/camcos/2012/7-1/p04.xhtml"><cite>Toward an efficient parallel in time method for partial differential equations</cite></a>.
+        <i>PFASST</i> combines aspects of the Parareal method with Spectral Deferred Correction and the Full-Approximation Scheme.
+    </p>
 
 
 
