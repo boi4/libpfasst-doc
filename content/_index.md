@@ -15,3 +15,6 @@ TODO
   <li>LibPFASST: The main component of this project</li>
   <li>tmpi.py: A terminal program for debugging MPI applications with dynamic MPI support.</li>
 </ul>
+
+For questions about this project, feel free to contact [me](https://fecht.cc).<br/>
+If you want to learn more about dynamic MPI or would like to contribute, please reach out to [Domink Huber](https://www.ce.cit.tum.de/caps/mitarbeiter/dominik-huber/) or [Prof. Martin Schreiber](https://www.martin-schreiber.info/).
