@@ -164,8 +164,18 @@ function showquote() {
   </script>
 
   <script src="{{ get_url(path="bootstrap.bundle-5.3.0.min.js") }}" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"></script>
-  <script src="{{ get_url(path="search.js") }}"></script>
   <script src="{{ get_url(path="elasticlunr.min.js") }}"></script>
+  <script src="{{ get_url(path="search.js") }}"></script>
+  <script>
+// initialize search
+if (document.readyState === "complete" ||
+    (document.readyState !== "loading" && !document.documentElement.doScroll)
+) {
+  initSearch("{{ get_url(path="@/_index.md") }}");
+} else {
+  document.addEventListener("DOMContentLoaded", () => {initSearch("{{ get_url(path="@/_index.md") }}")});
+}
+  </script>
 </body>
 
 </html>

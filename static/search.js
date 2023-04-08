@@ -135,7 +135,7 @@ function formatSearchResultItem(item, terms) {
   + '</div>';
 }
 
-function initSearch() {
+function initSearch(base_url) {
   var $searchInput = document.getElementById("search");
   var $searchResults = document.querySelector(".search-results");
   var $searchResultsItems = document.querySelector(".search-results__items");
@@ -153,7 +153,7 @@ function initSearch() {
 
   var initIndex = async function () {
     if (index === undefined) {
-      index = fetch("/search_index.en.json")
+      index = fetch(base_url + "search_index.en.json")
         .then(
           async function(response) {
             return await elasticlunr.Index.load(await response.json());
@@ -194,13 +194,4 @@ function initSearch() {
       $searchResults.style.display = "none";
     }
   });
-}
-
-
-if (document.readyState === "complete" ||
-    (document.readyState !== "loading" && !document.documentElement.doScroll)
-) {
-  initSearch();
-} else {
-  document.addEventListener("DOMContentLoaded", initSearch);
 }
