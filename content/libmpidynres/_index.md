@@ -17,53 +17,24 @@ The main idea of **libmpidynres** is (in C):
 
 The source code of *libmpidynres* can be found on [GitHub](https://github.com/boi4/libmpidynres/tree/fortran).
 
-**Important Note: libmpidynres is not compatible with newer MPI implementations due to naming conflicts. If you use Open MPI, make sure to use Open MPI version v4.1.5 or below.**
-
-
-### LibPFASST + libmpidynres
-
-The initial adaptive LibPFASST implementation was based on *libmpidynres* and the API documented here.
-That version of *LibPFASST* can be found on the branch `mpidynres` of the LibPFASST repository ([link](https://github.com/boi4/LibPFASST/tree/mpidynres)).
-Note that, compared to the final, Open MPI-based version, this version is not documented to the same amount here and also contains less features.
-<!-- TODO JAN: Add example -->
-
-To compile this version of LibPFASST, you can run the following commands:
-
+To compile **libmpidynres**, use:
 ```bash
-git clone --branch mpidynres git@github.com:boi4/LibPFASST.git
 git clone --branch fortran git@github.com:boi4/libmpidynres.git
 
 # build libmpidynres
 make -C libmpidynres
-
-# build LibPFASST
-cd LibPFASST
-# make it work with newer gfortran versions
-sed -i '/FFLAGS = -fallow-argument-mismatch/s/^.*$/FFLAGS += -fallow-argument-mismatch/g' Makefile.local
-make DYNRES=TRUE MPIDYNRES_PATH=../libmpidynres
 ```
 
-An example application is included in the `Tutorials/EX6_dynamic_mpi` directory.
-To compile it use (`MPIDYNRES_PATH` might need to be adjusted):
-```bash
-cd Tutorials/EX6_dynamic_mpi
+**Important Note: libmpidynres is not compatible with newer MPI implementations due to naming conflicts. If you use Open MPI, make sure to use Open MPI version v4.1.5 or below.**
 
-# compile example
-make MPIDYNRES_PATH=../../../libmpidynres
-```
-
-To run it use (`LD_LIBRARY_PATH` and mpirun arguments might need to be adjusted):
-```
-LD_LIBRARY_PATH=../../../libmpidynres/build/lib mpirun -n 4 ./main.exe probin.nml
-```
-
-To get more debug output, the environment variable `MPIDYNRES_DEBUG` can be set to any value before running the program.
+When compiling **libmpidynres**, the mpi routines are linked together with the C routines into a single shared library at `libmpidynres/build/lib/libmpidynres.so`.
+Additionally, four Fortran modules are built into `libmpidynres/build/include/` (`mpidynres.mod`, `mpidynres_f08.mod`, `mpidynres_sim.mod`, `mpidynres_f08.mod`).
+These can be installed into the system by running `sudo make libmpidynres install`.
 
 
 ### Fortran Extension Documentation
 
 To support Fortran applications like `LibPFASST`, **libmpidynres** was extended with a Fortran interface.
-The source code of this extension can be found [here](https://github.com/boi4/libmpidynres/tree/fortran).
 
 To use the **libmpidynres** in Fortran, an application wrapper must be created.
 A typical application wrapper in *Fortran 2008* might look like this:
@@ -118,13 +89,79 @@ Note that:
  * to access the **libmpidynres** application functions, the module `mpidynres_f08` is imported. For *Fortran 90*, the module is called `mpidynres`
  * the entry subroutine must be annotated using `bind(c)`
 
-A complete example can be found in the `/examples` folder ([link f08](https://github.com/boi4/libmpidynres/blob/fortran/examples/0a_fortran_example.f08), [link f08](https://github.com/boi4/libmpidynres/blob/fortran/examples/0b_fortran_f08_example.f08)).
+A complete example can be found in the `libmipdynres/examples` folder ([link f08](https://github.com/boi4/libmpidynres/blob/fortran/examples/0a_fortran_example.f08), [link f08](https://github.com/boi4/libmpidynres/blob/fortran/examples/0b_fortran_f08_example.f08)).
 
-These examples can be compiled by running `make fortran_examples` in the root of the repository.
+These examples can be compiled by running `make fortran_examples`.
+
+
+
+### LibPFASST + libmpidynres
+
+The initial adaptive LibPFASST implementation was based on *libmpidynres* and the API documented here.
+That version of *LibPFASST* can be found on the branch `mpidynres` of the LibPFASST repository ([link](https://github.com/boi4/LibPFASST/tree/mpidynres)).
+Note that, compared to the final Open MPI-based version, this version is not documented to the same amount here and also contains less features.
+The instructions here are only mentioned for the sake of completeness.
+
+To compile LibPFASST with mpidynres, you can run the following commands (in the parent directory of the **libmpidynres** source code):
+
+```bash
+git clone --branch mpidynres git@github.com:boi4/LibPFASST.git
+
+cd LibPFASST
+
+# make it work with newer gfortran versions
+sed -i '/FFLAGS = -fallow-argument-mismatch/s/^.*$/FFLAGS += -fallow-argument-mismatch/g' Makefile.local
+
+# compile
+make DYNRES=TRUE MPIDYNRES_PATH=../libmpidynres
+```
+
+During the compilation of *LibPFASST*, the libmpidynres Fortran module files are included by passing them to the compilation commands. When using `LibPFASST`, the final executable must be dynamically linked against `libmpidynres.so`.
+
+An example application is included in the `Tutorials/EX6_dynamic_mpi` directory.
+To compile it use:
+```bash
+cd Tutorials/EX6_dynamic_mpi
+
+# compile example
+make MPIDYNRES_PATH=../../../libmpidynres
+```
+
+To run it on up to 7 processes (8 with the mpidynres resource manager) use:
+```
+LD_LIBRARY_PATH=../../../libmpidynres/build/lib mpirun -n 8 ./main.exe probin.nml
+```
+
+To get more debug output, the environment variable `MPIDYNRES_DEBUG` can be set to any value before running the program.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 <a href="#f90API" class="collapsed" data-bs-toggle="collapse" data-bs-target="#f90API" aria-expanded="false" aria-controls="f90API" style="text-decoration: none; color: black;">
-<h3><span class="togglearrow" >▲</span>Fortran 90 API</h3>
+<h3><span class="togglearrow" >▲</span>libmpidynres Fortran 90 API (click to expand)</h3>
 </a>
 
 <div id="f90API" class="collapse">
@@ -323,7 +360,7 @@ end subroutine MPIDYNRES_SIM_START
 
 
 <a href="#f08API" class="collapsed" data-bs-toggle="collapse" data-bs-target="#f08API" aria-expanded="false" aria-controls="f08API" style="text-decoration: none; color: black;">
-<h3><span class="togglearrow" >▲</span>Fortran 2008 API</h3>
+<h3><span class="togglearrow" >▲</span>libmpidynres Fortran 2008 API (click to expand)</h3>
 </a>
 
 <div id="f08API" class="collapse">
@@ -526,3 +563,4 @@ end subroutine MPIDYNRES_SIM_START
 ```
 
 </div>
+
