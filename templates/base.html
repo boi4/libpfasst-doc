@@ -126,42 +126,13 @@
       {% endblock %}
     </div>
 
-    <!-- Easter Egg :) -->
-    <figure class="d-none" id="quotefig">
-      <blockquote class="blockquote">
-        <p id="quotetext"></p>
-      </blockquote>
-      <figcaption class="blockquote-footer" id="quoteauthor">
-      </figcaption>
-    </figure>
 
   </div> <!-- End of Container -->
 
   <!-- Footer -->
-  <div class="container mb-3" onclick="showquote()">
+  <div class="container mb-3">
     <div class="text-muted">TUM Interdisciplinary Project, Jan Fecht, 2023</div>
   </div>
-
-  <script>
-function showquote() {
-     let quotes = [
-       ["Everyone knows that debugging is twice as hard as writing a program in the first place. So if you're as clever as you can be when you write it, how will you ever debug it?", "Brian Kernighan"],
-       ["It always takes longer than you expect, even when you take into account Hofstadter's Law.", "Hofstadter's Law"],
-       ["You can measure a programmer's perspective by noting his attitude on the continuing vitality of FORTRAN.", "Alan Perlis"],
-       ["FORTRAN was the language of choice for the same reason that three-legged races are popular.", "Ken Thompson"],
-       ["FORTRAN's tragic fate has been its wide acceptance, mentally chaining thousands and thousands of programmers to our past mistakes.", "Edsger W. Dijkstra"],
-       ["There are only two kinds of languages: the ones people complain about and the ones nobody uses.", "Bjarne Stroustrup"]
-                         ];
-     let quotefig = document.getElementById("quotefig");
-     let quotetext = document.getElementById("quotetext");
-     let quoteauthor = document.getElementById("quoteauthor");
-
-     let quote = quotes[Math.floor(Math.random()*quotes.length)];
-     quotefig.classList.remove("d-none");
-     quotetext.innerHTML = quote[0];
-     quoteauthor.innerHTML = quote[1];
-}
-  </script>
 
   <script src="{{ get_url(path="bootstrap.bundle-5.3.0.min.js") }}" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"></script>
   <script src="{{ get_url(path="elasticlunr.min.js") }}"></script>
