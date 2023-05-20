@@ -3,21 +3,29 @@ title = "libmpidynres"
 +++
 ## libmpidynres
 
-**libmpidynres** is library that provides an emulation layer for dynamic resources in MPI based on `MPI_COMM_WORLD`.
+**libmpidynres** is a library that provides an emulation layer for dynamic resources in MPI based on `MPI_COMM_WORLD`.
 It was implemented as a part of the bachelor thesis *A Simulation Layer for Dynamic Resources with MPI Sessions* (2020).
 It is based on an early MPI Sessions API for dynamic resources which is documented extensively in section 5 of the thesis ([download](https://fecht.cc/public/ba.pdf)).
 More information can also be found in *An Emulation Layer for Dynamic Resources with MPI Sessions* by Fecht et. al (2022).
 
-The main idea of **libmpidynres** is (in C):
-* the user includes both `mpi.h` and `mpidynres.h` header files
+The main idea of **libmpidynres**:
+* the user includes both `mpi.h` and `mpidynres.h` header files (in C) or the Fortran modules described below
 * **limpidynres** provides an MPI Sessions interface very similar to the interface that was released in MPI-4
 * additionally, **libmpidyres** provides an interface to deal with changing number of resources (i.e. processes)
-* the user only uses `MPI` communicators that are provided by `mpidynres.h` functions (`MPI_COMM_WORLD` is hidden from the user)
+* the user only uses `MPI` communicators that are based on the ones provided by **libmpidynres** functions (`MPI_COMM_WORLD` is hidden from the user)
 * **libmpidynres** starts and shuts down application processes using `MPI_COMM_WORLD`
 
-The source code of *libmpidynres* can be found on [GitHub](https://github.com/boi4/libmpidynres/tree/fortran).
+The source code of *libmpidynres* can be found on [GitHub](https://github.com/boi4/libmpidynres).
 
-To compile **libmpidynres**, use:
+<div class="alert alert-warning" role="alert">
+  Warning: libmpidynres is not compatible with newer MPI implementations due to naming conflicts. If you use Open MPI, make sure to use Open MPI version v4.1.5 or below.
+</div>
+
+### Fortran Extension Documentation
+
+To support Fortran applications like `LibPFASST`, **libmpidynres** was extended with a Fortran interface.
+
+To compile **libmpidynres** with Fortran support, use:
 ```bash
 git clone --branch fortran git@github.com:boi4/libmpidynres.git
 
@@ -25,16 +33,9 @@ git clone --branch fortran git@github.com:boi4/libmpidynres.git
 make -C libmpidynres
 ```
 
-**Important Note: libmpidynres is not compatible with newer MPI implementations due to naming conflicts. If you use Open MPI, make sure to use Open MPI version v4.1.5 or below.**
-
-When compiling **libmpidynres**, the mpi routines are linked together with the C routines into a single shared library at `libmpidynres/build/lib/libmpidynres.so`.
+When compiling **libmpidynres** with the instructions above, the Fortran routines are linked together with the C routines into a single shared library at `libmpidynres/build/lib/libmpidynres.so`.
 Additionally, four Fortran modules are built into `libmpidynres/build/include/` (`mpidynres.mod`, `mpidynres_f08.mod`, `mpidynres_sim.mod`, `mpidynres_f08.mod`).
-These can be installed into the system by running `sudo make libmpidynres install`.
-
-
-### Fortran Extension Documentation
-
-To support Fortran applications like `LibPFASST`, **libmpidynres** was extended with a Fortran interface.
+These can be installed into the system by running `sudo make -C libmpidynres install`.
 
 To use the **libmpidynres** in Fortran, an application wrapper must be created.
 A typical application wrapper in *Fortran 2008* might look like this:
@@ -89,7 +90,7 @@ Note that:
  * to access the **libmpidynres** application functions, the module `mpidynres_f08` is imported. For *Fortran 90*, the module is called `mpidynres`
  * the entry subroutine must be annotated using `bind(c)`
 
-A complete example can be found in the `libmipdynres/examples` folder ([link f08](https://github.com/boi4/libmpidynres/blob/fortran/examples/0a_fortran_example.f08), [link f08](https://github.com/boi4/libmpidynres/blob/fortran/examples/0b_fortran_f08_example.f08)).
+A complete example can be found in the `libmipdynres/examples` folder ([link f08](https://github.com/boi4/libmpidynres/blob/master/examples/0a_fortran_example.f08), [link f08](https://github.com/boi4/libmpidynres/blob/master/examples/0b_fortran_f08_example.f08)).
 
 These examples can be compiled by running `make fortran_examples`.
 
@@ -379,7 +380,6 @@ As in Fortran 90, the session argument of the API is of type `type(c_ptr)`.
 The mpidynres config type is defined like this:
 ```f90
 use mpi_f08
-
 type, bind(C) :: MPIDYNRES_SIM_CONFIG
   type(MPI_Comm) :: base_communicator
   type(MPI_Info) :: manager_config

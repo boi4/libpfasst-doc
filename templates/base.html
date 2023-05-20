@@ -75,6 +75,12 @@
   display: inline-block;
   margin-bottom: 0.5rem;
 }
+
+
+.text-muted > a {
+  color: var(--bs-secondary-color) !important;
+}
+
 </style>
 </head>
 
@@ -96,11 +102,6 @@
           <li class="nav-item">
             <a class="nav-link{% if section.title == "Open MPI" %} active{% endif %}" href="{{ get_url(path="@/open-mpi/_index.md") }}">Open MPI</a>
           </li>
-
-          <li class="nav-item">
-            <a class="nav-link{% if section.title == "libmpidynres" %} active{% endif %}" href="{{ get_url(path="@/libmpidynres/_index.md") }}">libmpidynres</a>
-          </li>
-
           <li class="nav-item">
             <a class="nav-link{% if section.title == "LibPFASST" %} active{% endif %}" href="{{ get_url(path="@/libpfasst/_index.md") }}">LibPFASST</a>
           </li>
@@ -108,7 +109,16 @@
           <li class="nav-item">
             <a class="nav-link{% if section.title == "Showcase" %} active{% endif %}" href="{{ get_url(path="@/showcase/_index.md") }}">Showcase</a>
           </li>
+
+          <li class="nav-item">
+            <a class="nav-link{% if section.title == "Tools" %} active{% endif %}" href="{{ get_url(path="@/tools/_index.md") }}">Tools</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link{% if section.title == "libmpidynres" %} active{% endif %}" href="{{ get_url(path="@/libmpidynres/_index.md") }}">libmpidynres</a>
+          </li>
         </ul>
+
 
         <div class="search-container navbar-form navbar-right mx-2">
             <input id="search" type="search" placeholder="🔎 Search this site" aria-label="Search">
@@ -132,7 +142,7 @@
 
   <!-- Footer -->
   <div class="container mb-3">
-    <div class="text-muted">TUM Interdisciplinary Project, Jan Fecht, 2023</div>
+    <div class="text-muted">TUM Interdisciplinary Project, Jan Fecht, 2023. Licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">Creative Commons Attribution 3.0 Unported License</a>.</div>
   </div>
 
   <script src="{{ get_url(path="bootstrap.bundle-5.3.0.min.js") }}" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"></script>

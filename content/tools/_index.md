@@ -1,0 +1,62 @@
++++
+title = "Tools"
++++
+# tmpi.py
+
+`tmpi.py` is a tool that facilitates the development and debugging of adaptive MPI applications.
+
+Its source code is available on Github: [https://github.com/boi4/tmpi-py](https://github.com/boi4/tmpi-py)
+
+It allows you to interact with each process of an MPI run in a different tmux (a terminal multiplexer) pane.
+This is very useful in terminal-only environments (ssh/docker/...) where typical tricks like starting multiple instances of a terminal emulator do not work.
+
+It is is a python rewrite of [tmpi](https://github.com/Azrael3000/tmpi) with the following benefits:
+
+* Faster startup
+* Support mpirun with multiple hosts (with `MPIRUNARGS="--host ..." ./tmpi.py ...`)
+* mpi rank and host are shown in the upper frame of each pane
+
+It has the following disadvantages:
+
+* you can run only one instance of `tmpi.py` on a single host
+* if you have mpi processes on other hosts, you need to be able to ssh into them
+* `tmpi.py` opens a port for remote mpi processes to register themselves. This can be a security issue.
+
+Run multiple MPI processes as a grid in a new tmux window and multiplex keyboard input to all of them.
+
+## Dependencies
+- [tmux](https://github.com/tmux/tmux/wiki)
+- [Reptyr](https://github.com/nelhage/reptyr) 
+- Python 3.7 or later
+
+## Further requirements
+- If you run mpi processes on remote hosts, you need to be able to ssh into them with the user that started `tmpi.py` without any password prompt
+
+## Installation
+Just copy the `tmpi.py` script somewhere in your `PATH`.
+If you run MPI on multiple hosts, the `tmpi.py` script must be available at the same location on each host.
+
+## Example usage
+
+Parallel debugging with GDB:
+```
+tmpi.py 4 gdb executable
+```
+
+It is advisable to run gdb with a script (e.g. `script.gdb`) so you can use
+```
+tmpi.py 4 gdb -x script.gdb executable
+```
+
+If you have a lot of processors you want to have `set pagination off` and add the `-q` argument to gdb:
+```
+tmpi.py 4 gdb -q -x script.gdb executable
+```
+This avoids pagination and the output of the copyright of gdb, which can be a nuissance when you have very small tmux panes.
+
+## Full usage
+See `def usage()` in the [script](tmpi)
+
+
+## Keybindings
+See `def usage()` in the [script](tmpi)
