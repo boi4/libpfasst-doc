@@ -17,7 +17,7 @@ The main idea of **libmpidynres**:
 
 The source code of *libmpidynres* can be found on [GitHub](https://github.com/boi4/libmpidynres).
 
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning position-static" role="alert">
   Warning: libmpidynres is not compatible with newer MPI implementations due to naming conflicts. If you use Open MPI, make sure to use Open MPI version v4.1.5 or below.
 </div>
 

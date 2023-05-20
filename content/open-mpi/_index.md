@@ -31,7 +31,7 @@ However, little work is required to add Fortran 08 support.
 Also, the non-blocking variants of the MPI Sessions API (`MPI_Session_dyn_v2a_psetop_nb`, `MPI_Session_dyn_v2a_query_psetop_nb`, `MPI_Session_get_pset_data_nb`) could not be implemented in Fortran, due to required conversion of the results of these calls.
 
 
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning position-static" role="alert">
   Warning: Due to the representation of strings in Fortran, spaces are disallowed in process set names.
 </div>
 
