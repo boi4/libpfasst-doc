@@ -10,7 +10,7 @@ LibPFASST is open-source and hosted on [GitHub](https://github.com/libpfasst/Lib
 
 ### Dynamic MPI support
 
-In the course of this IDP, LibPFASST was extended with an interface that allows it to dynamically grow and shrink by an arbitrary number of processes using the [dynamic Open MPI runtime](http://torbus.lan:1111/open-mpi/).
+In the course of this IDP, LibPFASST was extended with an interface that allows it to dynamically grow and shrink by an arbitrary number of processes using the [dynamic Open MPI runtime](@/open-mpi/_index.md).
 
 
 

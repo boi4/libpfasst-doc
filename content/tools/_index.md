@@ -289,5 +289,51 @@ options:
 <img class="img-fluid rounded mx-auto border" src="./VisualizeDynProcs.png">
 </a>
 <figcaption class="figure-caption" style="text-align: center; margin-bottom: 2em; margin-top: 1em">
-    Final frame of the visualization
+    Final result of the visualization
 </figcaption>
+
+
+
+---
+
+
+<br/>
+
+## MPI modifier scripts
+
+I also created some bash scripts that can be simply prepended to the actual command ran by MPI.
+These bash scripts usually modify the output of each rank and can be helpful for debugging.
+They also work with dynamic Open MPI.
+
+For example instead of running:
+
+```
+mpirun -np 8 ./main.exe probin.nml
+```
+
+You run:
+
+```
+mpirun -np 8 ./color_rank.sh ./main.exe probin.nml
+```
+
+to color the output of each process differently.
+
+The scripts also be chained:
+
+```
+mpirun -np 8 ./color_rank.sh ./prepend_rank.sh ./main.exe probin.nml
+```
+
+
+
+| Script                                 | Description                                                                                                                                                                                     |
+|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|[color_rank.sh](./color_rank.sh)        | Colors the output of each process based on its `$PMIX_RANK`.                                                                                                                                    |
+|[env_wrapper.sh](./env_wrapper.sh)      | Prints all environment variables of each process at the beginning.                                                                                                                              |
+|[ltrace_run.sh](./ltrace_runs.sh)       | Uses `ltrace` to capture process set related MPI calls. Cannot be combined with GDB.                                                                                                            |
+|[prepend_rank.sh](./prepend_rank.sh)    | Prepends `$PMIX_RANK` to each line of the processes.                                                                                                                                            |
+|[prepend_spacing.sh](./prepend_rank.sh) | Adds some amount of spacing based on `$PMIX_RANK` to each line of the processes. When making the terminal font very small, this can visualize the outputs of different ranks next to each other.|
+
+
+<br/>
