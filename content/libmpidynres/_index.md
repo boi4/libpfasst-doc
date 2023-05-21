@@ -27,7 +27,7 @@ To support Fortran applications like `LibPFASST`, **libmpidynres** was extended 
 
 To compile **libmpidynres** with Fortran support, use:
 ```bash
-git clone --branch fortran git@github.com:boi4/libmpidynres.git
+git clone --branch fortran https://github.com/boi4/libmpidynres.git
 
 # build libmpidynres
 make -C libmpidynres
@@ -106,7 +106,7 @@ The instructions here are only mentioned for the sake of completeness.
 To compile LibPFASST with mpidynres, you can run the following commands (in the parent directory of the **libmpidynres** source code):
 
 ```bash
-git clone --branch mpidynres git@github.com:boi4/LibPFASST.git
+git clone --branch mpidynres https://github.com/boi4/LibPFASST.git
 
 cd LibPFASST
 

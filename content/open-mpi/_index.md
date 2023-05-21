@@ -9,7 +9,7 @@ For the development of dynamic LibPFASST, an Open MPI fork was used to implement
 
 ## Contributions to Upstream
 
-MPI Sessions support, especially in Fortran, is still lacking in the offical Open MPI repos (as of early 2023).
+MPI Sessions support, especially in Fortran, is still lacking in the offical Open MPI repo (as of early 2023).
 In this project, two pull requests were created and merged to the upstream Open MPI repository:
 
 * [ompi/pull/11496](https://github.com/open-mpi/ompi/pull/11496): *Add MPI_SESSION_NULL to fortran* - make the constant `MPI_SESSION_NULL` available in Fortran programs
@@ -22,8 +22,7 @@ In this project, two pull requests were created and merged to the upstream Open 
 A new API for dynamic resource management was introduced by Huber et al in *Towards Dynamic Resource Management with MPI Sessions and PMIx* (2022).
 This API has been continously refined and is the basis for the final version of this project.
 
-In the course of this IDP, a Fortran interface was derived for version `v2a` of the Open MPI prototype introduced by Dominik Huber ([link](https://gitlab.inria.fr/dynres/dyn-procs/ompi/-/tree/fortran-support)).
-For access, [please contact Dominik](https://www.ce.cit.tum.de/caps/mitarbeiter/dominik-huber/).
+In the course of this IDP, a Fortran interface was derived for version `v2a` of the Open MPI prototype introduced by Dominik Huber ([link to repo](https://gitlab.inria.fr/dynres/dyn-procs/ompi/-/tree/fortran-support)).
 
 The interface is specified in Fortran 90, as this is the MPI version that LibPFASST uses.
 However, little work is required to add Fortran 08 support.
@@ -33,6 +32,10 @@ Also, the non-blocking variants of the MPI Sessions API (`MPI_Session_dyn_v2a_ps
 
 <div class="alert alert-warning position-static" role="alert">
   Warning: Due to the representation of strings in Fortran, spaces are disallowed in process set names.
+</div>
+
+<div class="alert alert-warning position-static" role="alert">
+  Warning: As of May 2023, the implementation (both for C and Fortran) only allows growing and shrinking in a node-wise granularity. If, for example, you are running a job on several nodes with 8 reserved processes each, you can only grow and shrink by a multiple 8 processes at once.
 </div>
 
 
@@ -89,7 +92,7 @@ salloc --nodes NNODES ...
 ```
 2. Run your application (replace `PROCS_PER_NODE` with the number of processors available on each node, which is also the granularity of the addition/removal of resources):
 ```
-mpirun --host $(scontrol show hostname $SLURM_NODELIST | sed 's/$/:'PROCS_PER_NODE'/g'  | tr '\n' ',') <further mpi run arguments> ...
+mpirun --host $(scontrol show hostname $SLURM_NODELIST | sed 's/$/:PROCS_PER_NODE/g'  | tr '\n' ',') <further mpirun arguments> ...
 ```
 
 
@@ -101,7 +104,7 @@ mpirun --host $(scontrol show hostname $SLURM_NODELIST | sed 's/$/:'PROCS_PER_NO
 
 A proof of concept, loop-based MPI Fortran application is available for testing the API [here](https://gitlab.inria.fr/dynres/dyn-procs/test_applications/-/blob/fortran-support/examples/dyn_mpi_sessions_v2a.f90). It behaves similar to the C examples in the same project.
 
-If you followed the quickguide linked above, the `test_applications` folder should already be avilable in your docker cluster.
+If you followed the quickguide linked above, the `test_applications` folder should already be available in your docker cluster.
 Make sure that you have started the docker cluster and entered the environment using the `./mpiuser-drop-in.sh` script.
 
 Then run the following commands:
@@ -113,7 +116,7 @@ cd /opt/hpc/build/test_applications
 scons example=DynMPISessions_v2a_fortran compileMode=release
 ```
 
-The resulting binary is avilable at `build/DynMPISessions_v2a_fortran_release`.
+The resulting binary is available at `build/DynMPISessions_v2a_fortran_release`.
 
 The following flags are available:
 ```
@@ -241,7 +244,7 @@ end interface
 
 * Works analogously to the C version.
 
-From [C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#process-set-dictionaries):
+From [the C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#process-set-dictionaries):
 
 ```
 RETURN: 
@@ -269,7 +272,7 @@ end interface
 
 * Works analogously to the C version.
 
-From [C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#process-set-dictionaries):
+From [the C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#process-set-dictionaries):
 
 ```
 RETURN: 
@@ -310,7 +313,7 @@ end interface
 * `noutput` needs to be set to the number of entries in `output_psets`.
 * On sucessful return and `type != MPI_PSETOP_NULL`, `noutput` will be set to the number of output psets and the names of the output psets will be located in `noutputs`.
 
-From [C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#set-operations):
+From [the C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#set-operations):
 
 ```
 RETURN: 
@@ -346,7 +349,7 @@ end interface
 * `noutput` needs to be set to the number of entries in `output_psets`.
 * On sucessful return `noutput` will be set to the number of output psets and the names of the output psets will be located in `noutputs`.
 
-From [C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#set-operations):
+From [the C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#set-operations):
 
 ```
 RETURN: 
@@ -377,7 +380,7 @@ end interface
 
 * Works analogously to the C version.
 
-From [C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#set-operations):
+From [the C documentation](https://gitlab.inria.fr/dynres/dyn-procs/ompi/#set-operations):
 
 ```
 RETURN: 

@@ -19,4 +19,4 @@ Many new software components were developed and some existing software component
 For questions about this project, feel free to [contact me](https://fecht.cc).<br/>
 If you want to learn more about dynamic MPI or would like to contribute, please reach out to [Domink Huber](https://www.ce.cit.tum.de/caps/mitarbeiter/dominik-huber/) or [Prof. Martin Schreiber](https://www.martin-schreiber.info/).
 
-The source code repository of this documentation [can be found on Github](https://github.com/boi4/libpfasst-doc) and can be downloaded [here](http://example.com).<!-- TODO -->
+The source code repository of this documentation [can be found on Github](https://github.com/boi4/libpfasst-doc).
