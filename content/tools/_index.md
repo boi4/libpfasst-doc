@@ -6,16 +6,14 @@ title = "Tools"
 
 Debugging parallel programs is hard. Especially MPI programs.
 
-Debugging adaptive programs is even harder. That is why I created multiple tools to facilitate the development and debugging of dynamic applications.
+Debugging dynamic MPI programs is even harder. That is why I created multiple tools to facilitate the development and debugging of dynamic applications.
 
 ## tmpi.py
 
-`tmpi.py` is a tool that facilitates the development and debugging of adaptive MPI applications.
-
-Its source code is available on Github: [https://github.com/boi4/tmpi-py](https://github.com/boi4/tmpi-py)
-
-It allows you to interact with each process of an MPI run in a different tmux (a terminal multiplexer) pane.
+`tmpi.py` allows you to interact with each process of an MPI run in a different tmux (a terminal multiplexer) pane.
 This is very useful in terminal-only environments (ssh/docker/...) where typical tricks like starting multiple instances of a terminal emulator do not work.
+
+The source code is available on Github: [https://github.com/boi4/tmpi-py](https://github.com/boi4/tmpi-py)
 
 It is is a python rewrite of [tmpi](https://github.com/Azrael3000/tmpi) with the following benefits:
 
@@ -32,7 +30,7 @@ It has the following disadvantages:
 * `tmpi.py` opens a port for remote mpi processes to register themselves. This might be a security issue.
 
 
-### Adaptive Applications
+### Dynamic Applications
 
 When running applications using [dynamic Open MPI](@/open-mpi/_index.md), `tmpi.py` will respond to resource changes in the following fashion:
 
@@ -154,8 +152,8 @@ In general, the keybindings from [tmux](https://github.com/tmux/tmux/wiki) apply
 It can be useful to visualize a dynamic MPI run, to be able to retrospectively figure out which Process Set events happened.
 It is usually quite difficult to figure this out own your own just by looking at print statements in the terminal (although `tmpi.py` already drastically improves this situation).
 
-Therefore, I have decided to design a log file format and write an accompanying log file visualizer called `DynVis`.
-The source code of it is available on [GitHub](https://github.com/boi4/dynprocs_visualize).
+Therefore, a log file format was designed and accompanying log file visualizer called `DynVis` was implemented.
+The source code of `DynVis` is available on [GitHub](https://github.com/boi4/dynprocs_visualize).
 
 
 ### Logging format (v1)
@@ -335,5 +333,6 @@ mpirun -np 8 ./color_rank.sh ./prepend_rank.sh ./main.exe probin.nml
 |[prepend_rank.sh](./prepend_rank.sh)    | Prepends `$PMIX_RANK` to each line of the processes.                                                                                                                                            |
 |[prepend_spacing.sh](./prepend_rank.sh) | Adds some amount of spacing based on `$PMIX_RANK` to each line of the processes. When making the terminal font very small, this can visualize the outputs of different ranks next to each other.|
 
+*Note: You might need to chmod +x the scripts after downloading them to make them executable*
 
 <br/>

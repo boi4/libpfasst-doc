@@ -98,7 +98,7 @@ These examples can be compiled by running `make fortran_examples`.
 
 ### LibPFASST + libmpidynres
 
-The initial adaptive LibPFASST implementation was based on *libmpidynres* and the API documented here.
+The initial dynamic LibPFASST implementation was based on *libmpidynres* and the API documented here.
 That version of *LibPFASST* can be found on the branch `mpidynres` of the LibPFASST repository ([link](https://github.com/boi4/LibPFASST/tree/mpidynres)).
 Note that, compared to the final Open MPI-based version, this version is not documented to the same amount here and also contains less features.
 The instructions here are only mentioned for the sake of completeness.
@@ -133,7 +133,7 @@ To run it on up to 7 processes (8 with the mpidynres resource manager) use:
 LD_LIBRARY_PATH=../../../libmpidynres/build/lib mpirun -n 8 ./main.exe probin.nml
 ```
 
-To get more debug output, the environment variable `MPIDYNRES_DEBUG` can be set to any value before running the program.
+To get more debug output, the environment variable `MPIDYNRES_DEBUG` can be set before running the program.
 
 
 
