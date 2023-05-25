@@ -3,12 +3,13 @@ title = "Dynamic LibPFASST"
 +++
 # Documentation for Dynamic LibPFASST
 
-This page provides the documentation of Jan Fecht's [interdisciplinary project](https://web.archive.org/web/20230520140608/https://www.cit.tum.de/en/cit/studies/degree-programs/master-informatics/interdisciplinary-project/) at the Technical University of Munich 2022-2023.
+This page provides the documentation of my [interdisciplinary project](https://web.archive.org/web/20230520140608/https://www.cit.tum.de/en/cit/studies/degree-programs/master-informatics/interdisciplinary-project/) at the Technical University of Munich 2022-2023.
 
 The goal of the project was to add dynamic MPI support to *LibPFASST*, a Fortran application that implements the PFASST method.
-TODO
 
-Many new software components were developed and some existing software components were modified in the course of this project:
+In addition to implementing dynamic MPI support, I have created a small showcase of the flexibility and power of dynamic MPI within LibPFASST.
+
+Many new software components were developed and some existing software components were modified in the course of this project. You can use the links below or in the navigation bar to get to the documentation of the respective software component.
 
  - [Open MPI](@/open-mpi/_index.md): Patrick Huber's dynamic Open MPI fork was extended with a Fortran interface.
  - [LibPFASST](@/libpfasst/_index.md): MPI Sessions and resizing support was added to LibPFASST, a Fortran implementation of the PFASST algorithm.

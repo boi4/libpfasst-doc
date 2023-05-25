@@ -4,8 +4,6 @@ title = "Open MPI"
 # Open MPI
 
 Open MPI is a free and open-source implemention of the MPI standard.
-For the development of dynamic LibPFASST, an Open MPI fork was used to implement the new process set API (see below).
-
 
 ## Contributions to Upstream
 
@@ -16,13 +14,13 @@ In this project, two pull requests were created and merged to the upstream Open 
 * [ompi/pull/11487](https://github.com/open-mpi/ompi/pull/11487): *Fix wrong buffer size in ompi_session_get_nth_pset_f* - fix a buffer overflow in one of the Fortran MPI Sessions calls
 
 
-
-## Dynamic MPI Fork
+## Dynamic Open MPI Fork
 
 A new API for dynamic resource management was introduced by Huber et al in *Towards Dynamic Resource Management with MPI Sessions and PMIx* (2022).
 This API has been continously refined and is the basis for the final version of this project.
 
 In the course of this IDP, a Fortran interface was derived for version `v2a` of the Open MPI prototype introduced by Dominik Huber ([link to repo](https://gitlab.inria.fr/dynres/dyn-procs/ompi/-/tree/fortran-support)).
+This interface was added to said Open MPI fork and has been merged into the `main` branch.
 
 The interface is specified in Fortran 90, as this is the MPI version that LibPFASST uses.
 However, little work is required to add Fortran 08 support.
@@ -54,7 +52,7 @@ For development, it might help to enable debug symbols within Open MPI. To enabl
 
 Based on the information provided here: [https://doku.lrz.de/display/PUBLIC/Building+software+in+user+space+with+spack](https://doku.lrz.de/display/PUBLIC/Building+software+in+user+space+with+spack)
 
-1. Download the spack packages for the Open MPI fork: <span style="font-size: 13px">[spack_packages.zip (44Kb)](./spack_packages.zip ())</span>
+1. Download the spack packages for the Open MPI fork: <span style="font-size: 13px">[spack_packages.zip](./spack_packages.zip ())</span>
 2. Copy the zip file into the home directory in your LRZ login node and unzip it there :
 ```bash
 unzip spack_packages.zip
@@ -77,7 +75,7 @@ mv packages ~/spack/repos/mine/
 spack install dyn_ompi
 ```
 
-From then on, to activate the environment when logging in, run:
+From then on, to activate the environment after logging in, run:
 
 ```
 module load user_spack
@@ -214,6 +212,7 @@ Additionally, an optional `integer ierror` argument can be added at the end of e
 
 The exception is the `output_psets` argument of `MPI_Session_dyn_v2a_psetop` and `MPI_Session_dyn_v2a_query_psetop`.
 Instead of being allocated by the Open MPI runtime, it requires the user to pre-allocate these.
+The reason for this is the difficulty of allocating Fortran objects in C. Furthermore, this has an additional benefit: It is easier to broadcast `output_psets`, as other processes might also allocate `output_psets` before the call.
 
 String arguments that contain a process set name and are of type `IN` or `INOUT` should be able to hold at least `MPI_MAX_PSET_NAME_LEN` arguments (constant is available in the `mpi` module).
 Furthermore, process set names are terminated by filling the rest of the string with blanks (`' '`, ASCII 0x20).

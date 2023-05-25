@@ -57,9 +57,9 @@ If you run MPI on multiple hosts, the `tmpi.py` script must be available at the 
 You need to pass at least two arguments.
 The first argument is the number of processes to use, every argument after that is the commandline to run.
 
-If the environement variable `TMPI_REMAIN=true`, the new window is set to remain on exit and has to be closed manually. ("C-b + &" by default)
+If the environment variable `TMPI_REMAIN=true`, the new window is set to remain on exit and has to be closed manually. ("C-b + &" by default)
 
-You can pass additional 'mpirun' argument via the `MPIRUNARGS`` environment variable
+You can pass additional 'mpirun' argument via the `MPIRUNARGS` environment variable
 
 You can use the environment variable `TMPI_TMUX_OPTIONS` to pass options to the `tmux` invocation,
   such as `TMPI_TMUX_OPTIONS='-f ~/.tmux.conf.tmpi'` to use a special tmux configuration for tmpi.
@@ -159,39 +159,39 @@ The source code of `DynVis` is available on [GitHub](https://github.com/boi4/dyn
 ### Logging format (v1)
 
 <div class="alert alert-warning position-static" role="alert">
-  Warning: This log file is a specification only. As of May 2023, the dynamic Open MPI fork does no actual logging.
+  Warning: This log file format is a specification only. As of May 2023, the dynamic Open MPI fork does no actual logging.
 </div>
 
-A log file of an MPI run is a CSV file containing lines in the following format:
+A v1 log file of a dynamic MPI run is a CSV file containing lines in the following format:
 
-`unixtimestampmilis (integer), #job id (integer), action (string), [Json with extra data, escaped with double quotes] (string)`
+`unixtimestampmilis (integer), #job id (integer), action (string), action data (string, single line JSON, escaped with double quotes)`
 
 Where `unixtimestampmilis` is the number of miliseconds since [epoch](https://en.wikipedia.org/wiki/Epoch_(computing)),
 `job_id` is a unique identifier for the MPI job that was started and
-`action` is one of the unique actions below and the json provides some more information to the action.
+`action` is one of the unique actions below and the final json column provides some additional information about the action.
 
 Additionally, we allow for blank lines, and lines starting with a pound sign (`#`), which are both ignored while parsing.
 
 Available actions:
 
-|**Action**         | **Description**                                                                               | **Example JSON**                                                                                                                                 |
-|-------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------- |
-|job_start          | A new job is started.                                                                         | `"{""job_id""        : 0}"`                                                                                                                      |
-|job_end            | A job has finished.                                                                           | `"{""job_id""        : 0}"`                                                                                                                      |
-|new_pset           | A new process set is announced. Needs to be done before any other interaction with that pset. | `"{""proc_ids""      : [0,1,2,3,4,5,6,7], ""id"": ""mpi://world_0""}"`                                                                           |
-|set_start          | A new process set is started for these processes (initial start or an add/grow).              | `"{""set_id""        : ""mpi                    ://world_0""}"`                                                                                  |
-|process_start      | A new process has started.                                                                    | `"{""proc_id""       : 0}"`                                                                                                                      |
-|process_shutdown   | A process has shutdown.                                                                       | `"{""proc_id""       : 0}"`                                                                                                                      |
-|psetop             | A process set operation has been applied by the runtime.                                      | `"{""initialized_by"": 0, ""set_id""            : ""mpi://world_0"", ""op"": ""grow"", ""input_sets"": [], ""output_sets"": [""mpi://grow_0""]}"`|
-|finalize_psetop    | The application has successfully called finalize_psetop.                                      | `"{""initialized_by"": 0, ""set_id""            : ""mpi://world_0""}"`                                                                           |
-|application_message| Some message from the application.                                                            | `"{""message""       : ""LibPFASST started""}"`                                                                                                  |
-|application_custom | Some custom data from the application.                                                        | *arbitrary, but valid JSON*                                                                                                                                      |
+|**Action**         | **Description**                                                                               | **Example JSON**                                                                                                                     |
+|-------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------- |
+|job_start          | A new job is started.                                                                         | `"{""job_id""        : 0}"`                                                                                                          |
+|job_end            | A job has finished.                                                                           | `"{""job_id""        : 0}"`                                                                                                          |
+|new_pset           | A new process set is announced. Needs to be done before any other interaction with that pset. | `"{""proc_ids""      : [0,1,2,3,4,5,6,7], ""id"": ""mpi://world_0""}"`                                                               |
+|set_start          | A new process set is started (initial start or an add/grow).                                  | `"{""set_id""        : ""mpi://world_0""}"`                                                                                          |
+|process_start      | A new process has started.                                                                    | `"{""proc_id""       : 0}"`                                                                                                          |
+|process_shutdown   | A process has shutdown.                                                                       | `"{""proc_id""       : 0}"`                                                                                                          |
+|psetop             | A process set operation has been applied by the runtime.                                      | `"{""initialized_by"": 0, ""set_id"": ""mpi://world_0"", ""op"": ""grow"", ""input_sets"": [], ""output_sets"": [""mpi://grow_0""]}"`|
+|finalize_psetop    | The application has successfully called finalize_psetop.                                      | `"{""initialized_by"": 0, ""set_id"": ""mpi://world_0""}"`                                                                           |
+|application_message| Some message from the application.                                                            | `"{""message""       : ""LibPFASST started""}"`                                                                                      |
+|application_custom | Some custom data from the application.                                                        | *arbitrary, but valid JSON*                                                                                                          |
 
 <br/>
 
-**Rationale:** This format can be easily parsed by most programs like Excel, Python-Pandas, etc. as it is a CSV format.
-CSV also allows simple merging (by concatenation) of log files and also allows the logger to log action by action compared to a more complex format like YAML or JSON.
-Allowing blank lines allow to add some visual separation of phases of the application and comments allow to manually add more context to specific events.
+**Rationale:** This format can be easily parsed by most programs like Excel, Python Pandas, etc. as it is a CSV format.
+CSV also allows simple merging (by concatenation) of log files and also allows the logger to log action by action compared to a more complex format like pure JSON.
+Allowing blank lines allows to add some visual separation of phases of the application and comments allow to manually add more context to specific events.
 
 Furthermore, here are some basic rules for the contents of a log files:
 
@@ -247,7 +247,7 @@ Run the `dynvis.py` script with the path to the log file:
 python3 ./dynvis.py path/to/log/file
 ```
 
-This will create an rendered video in `media/videos/480p15/VisualizeDynProcs.mp4`.
+This will create a rendered video at `media/videos/480p15/VisualizeDynProcs.mp4`.
 
 There exist some command line flags to tweak the behavior of DynVis:
 
@@ -329,10 +329,10 @@ mpirun -np 8 ./color_rank.sh ./prepend_rank.sh ./main.exe probin.nml
 |----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |[color_rank.sh](./color_rank.sh)        | Colors the output of each process based on its `$PMIX_RANK`.                                                                                                                                    |
 |[env_wrapper.sh](./env_wrapper.sh)      | Prints all environment variables of each process at the beginning.                                                                                                                              |
-|[ltrace_run.sh](./ltrace_runs.sh)       | Uses `ltrace` to capture process set related MPI calls. Cannot be combined with GDB.                                                                                                            |
+|[ltrace_run.sh](./ltrace_runs.sh)       | Uses `ltrace` to capture pset operation related MPI calls. Cannot be combined with GDB.                                                                                                         |
 |[prepend_rank.sh](./prepend_rank.sh)    | Prepends `$PMIX_RANK` to each line of the processes.                                                                                                                                            |
 |[prepend_spacing.sh](./prepend_rank.sh) | Adds some amount of spacing based on `$PMIX_RANK` to each line of the processes. When making the terminal font very small, this can visualize the outputs of different ranks next to each other.|
 
+
 *Note: You might need to chmod +x the scripts after downloading them to make them executable*
 
-<br/>
