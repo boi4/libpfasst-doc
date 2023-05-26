@@ -98,10 +98,14 @@ These examples can be compiled by running `make fortran_examples`.
 
 ### LibPFASST + libmpidynres
 
+<div class="alert alert-danger position-static" role="alert">
+
 The initial dynamic LibPFASST implementation was based on *libmpidynres* and the API documented here.
 That version of *LibPFASST* can be found on the branch `mpidynres` of the LibPFASST repository ([link](https://github.com/boi4/LibPFASST/tree/mpidynres)).
-Note that, compared to the final Open MPI-based version, this version is not documented to the same amount here and also contains less features.
+Note that, compared to the final, Open MPI-based version, this version is not documented to the same amount here and also contains less features.
 The instructions here are only mentioned for the sake of completeness.
+
+</div>
 
 To compile LibPFASST with mpidynres, you can run the following commands (in the parent directory of the **libmpidynres** source code):
 

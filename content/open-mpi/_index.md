@@ -37,7 +37,7 @@ Also, the non-blocking variants of the MPI Sessions API (`MPI_Session_dyn_v2a_ps
 </div>
 
 
-### Setup instructions for local machine
+### Setup instructions for Docker Cluster
 
 It is advised to use the repository and follow the setup instructions described in the quickguide [here](https://gitlab.inria.fr/dynres/dyn-procs/docker-cluster) to setup a multi-container docker cluster on your computer.
 Alternatively, you can also try to manually build the components: [prrte](https://gitlab.inria.fr/dynres/dyn-procs/prrte),

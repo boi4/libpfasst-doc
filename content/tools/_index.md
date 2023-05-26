@@ -127,7 +127,7 @@ In general, the keybindings from [tmux](https://github.com/tmux/tmux/wiki) apply
 <img class="img-fluid rounded mx-auto" src="./tmpi_debug_example.png">
 </a>
 <figcaption class="figure-caption" style="text-align: center; margin-bottom: 2em; margin-top: 1em">
-    tmpi.py showing 16 gdb processes debugging a single MPI application.
+    tmpi.py showing 16 gdb processes debugging an MPI application.
 </figcaption>
 
 <div class="embed-responsive embed-responsive-16by9">
@@ -174,6 +174,8 @@ Additionally, we allow for blank lines, and lines starting with a pound sign (`#
 
 Available actions:
 
+<div style="overflow-x:auto;">
+
 |**Action**         | **Description**                                                                               | **Example JSON**                                                                                                                     |
 |-------------------|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------- |
 |job_start          | A new job is started.                                                                         | `"{""job_id""        : 0}"`                                                                                                          |
@@ -187,6 +189,7 @@ Available actions:
 |application_message| Some message from the application.                                                            | `"{""message""       : ""LibPFASST started""}"`                                                                                      |
 |application_custom | Some custom data from the application.                                                        | *arbitrary, but valid JSON*                                                                                                          |
 
+</div>
 <br/>
 
 **Rationale:** This format can be easily parsed by most programs like Excel, Python Pandas, etc. as it is a CSV format.
@@ -264,7 +267,7 @@ options:
   --round-to ROUND_TO, -r ROUND_TO
                         On how many 10^r miliseconds to round the time to when aligning events
   --save_last_frame, -s
-                        Save as last frame as a picture
+                        Save last frame as a picture
 ```
 
 
@@ -309,7 +312,7 @@ For example instead of running:
 mpirun -np 8 ./main.exe probin.nml
 ```
 
-You run:
+You run
 
 ```
 mpirun -np 8 ./color_rank.sh ./main.exe probin.nml
@@ -317,13 +320,15 @@ mpirun -np 8 ./color_rank.sh ./main.exe probin.nml
 
 to color the output of each process differently.
 
-The scripts also be chained:
+The scripts can also be chained together:
 
 ```
 mpirun -np 8 ./color_rank.sh ./prepend_rank.sh ./main.exe probin.nml
 ```
 
 
+
+<div style="overflow-x:auto;">
 
 | Script                                 | Description                                                                                                                                                                                     |
 |----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -333,6 +338,7 @@ mpirun -np 8 ./color_rank.sh ./prepend_rank.sh ./main.exe probin.nml
 |[prepend_rank.sh](./prepend_rank.sh)    | Prepends `$PMIX_RANK` to each line of the processes.                                                                                                                                            |
 |[prepend_spacing.sh](./prepend_rank.sh) | Adds some amount of spacing based on `$PMIX_RANK` to each line of the processes. When making the terminal font very small, this can visualize the outputs of different ranks next to each other.|
 
+</div>
 
 *Note: You might need to chmod +x the scripts after downloading them to make them executable*
 
