@@ -88,16 +88,6 @@ These implement resizing in the following fashion (see also the video at the top
 
 To compile this program, make sure that you have built the dynamic version of LibPFASST that can be found [here](https://github.com/boi4/libpfasst).
 
-Furthermore, you will need to build hypre:
-
-```
-git clone https://github.com/hypre-space/hypre.git
-cd hypre/src
-./configure --disable-fortran
-make -j
-cd ../..
-```
-
 Then run the following commands:
 
 ```
