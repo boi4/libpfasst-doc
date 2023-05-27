@@ -104,7 +104,7 @@ The following is an illustration of how this would look like (`GROW` and `SHRINK
 
 ## Build & Usage Instructions
 
-If you have followed the instructions for the docker build in the [Open MPI section](@/open-mpi/_index.md), LibPFASST was already cloned and compiled at `/opt/hpc/build/LibPFASST`.
+*Note: If you have followed the instructions for the Docker build in the [Open MPI section](@/open-mpi/_index.md), LibPFASST was already cloned and compiled at `/opt/hpc/build/LibPFASST`.*
 
 Before compiling LibPFASST, make sure that you have installed the dynamic Open MPI fork in one of the ways described in [the Open MPI section](@/open-mpi/_index.md) and `mpicc` and `mpifort` are both in your path.
 You can double check by running `mpicc --showme` and `mpifort --showme` and validate that the right include and linking paths are presented.
@@ -419,7 +419,21 @@ This module contains routines that can be called by the user, generic helper rou
 The complete reference for the user-facing routines is available at the bottom of this page.
 
 
-#### State Syncing
+#### Resizing process set operations
+
+In normal mode, growing and shrinking is implemented using `PSETOP_GROW` and `PSETOP_SHRINK` process set operations:
+
+* **growing:** `PSETOP_GROW` starts a new set of processes and merges a given process set with the new set of processes.
+In dynamic LibPFASST, the old `pf%dynprocs%main_pset` is replace with the result process set from the grow operation.
+New processes can then retrieve the name of this new merged process set from the dictionary associated with their mpi://WORLD process set.
+
+* **shrinking:** In case of shrinking, LibPFASST can only shrink by removing time processors from the end. Therefore we must restrict the processes the runtime is allowed to remove. This is done by using an `PSETOP_SPLIT` operation on the main process set.
+For example, when LibPFASST wants to remove the last 2 time processors from a total of 5, a SPLIT(main_pset, "3,2") operation is done in the `pf_dynprocs_get_shrink_union` routine. The second split process set is then given as an additional argument to `PSETOP_SHRINK`.
+
+In both cases we need the rank order preservation assumption so that the relative order of processes stays the same.
+
+
+#### State syncing
 
 There are two types of states in LibPFASST:
 
@@ -447,7 +461,7 @@ In this implementation, the only dynamic state that is shared is the following:
 * The current block number (note that this information is not strictly required for the algorithm, but can be useful for logging)
 * The solution of the previous block (= the initial condition for this block)
 
-Implicitly, the size of a block and the step to be worked on are contained in the size of the communicator and the rank of a process in this communicator.
+Implicitly, the size of a block and the relative time step to work on are contained in the size of the communicator and the rank of a process in this communicator.
 
 This state sharing is implemented in the `pf_dynprocs_sync_state` routine in the `pf_dynprocs.f90` file using a broadcast from rank 0 over the `pf%comm%comm` communicator (which was derived from the main pset).
 The routine assumes that both old and new processes are already merged into a single communicator stored in `pf%comm`.
@@ -459,9 +473,12 @@ becomes dynamic. For example, when LibPFASST is used in a larger application whi
 Another example might be that we cannot ensure that configuration files stay the same on the disk, e.g., when doing runs lasting multiple hours or days.
 
 In these cases more state needs to be synchronized.
-To do this, the application must add a synchronization routine to either the `PF_PRE_SYNC` or the `PF_POST_SYNC` hook. <!-- TODO!!!!!!! -->
+To do this, the application must add a synchronization routine to either the `PF_PRE_SYNC` or the `PF_POST_SYNC` hook.
 This hook should behave similarly to the `pf_dynprocs_sync_state` routine in the `pf_dynprocs.f90` file.
 
+
+
+---
 
 
 <a href="#f90API" class="collapsed" data-bs-toggle="collapse" data-bs-target="#f90API" aria-expanded="false" aria-controls="f90API" style="text-decoration: none; color: black;">
@@ -474,6 +491,8 @@ This hook should behave similarly to the `pf_dynprocs_sync_state` routine in the
 The following routines are part of the `pf_mod_dynprocs` module (`src/pf_dynprocs.f90`).
 
 **Main Routines**
+
+---
 
 ```f90
 subroutine pf_dynprocs_create(this, session, main_pset, global_pset, horizontal_pset)
@@ -493,6 +512,9 @@ When running LibPFASST in "space-parallel mode", both `global_pset` and `horizon
 `horizontal_pset` is a process set that contains the processes from all parallel LibPFASST runs that will work on the same time step as the current process.
 The different `main_pset` and `horizontal_pset` arguments create a grid on top of `global_pset`. See [the showcase page](@/showcase/_index.md) for a explanation of this.
 
+---
+
+<br/>
 
 ---
 
@@ -503,6 +525,10 @@ end subroutine pf_dynprocs_destroy
 ```
 
 Destructs a `dynprocs_t` object. Note that the MPI Session given in the constructor must be finalized by the user.
+
+---
+
+<br/>
 
 ---
 
@@ -522,10 +548,14 @@ This routine will point `pf%dynprocs` to the given `dynprocs` argument and will 
 Furthermore, this routine established communication from the process sets contained within `dynprocs` and will also establish communication to an existing LibPFASST run if the process was started dynamically.
 
 
+---
+
 
 **Generic Helper Routines**
 
 The following routines are not PFASST specific and are provided as helpers for internal routines, but can also be used by the user for convenience.
+
+---
 
 ```f90
 subroutine pf_dynprocs_comm_from_pset(session, pset, comm)
@@ -537,6 +567,11 @@ end subroutine pf_dynprocs_comm_from_pset
 
 Create an MPI communicator from the given process set.
 Combines `MPI_Group_from_session_pset` and `MPI_Comm_create_from_group`.
+
+---
+
+<br/>
+
 
 ---
 
@@ -552,6 +587,11 @@ Check if the process set `pset` contains the current process.
 
 ---
 
+<br/>
+
+
+---
+
 ```f90
 subroutine pf_dynprocs_check_dynamic(session, is_dynamic)
   integer, intent(in)  :: session
@@ -560,6 +600,10 @@ end subroutine pf_dynprocs_check_dynamic
 ```
 
 Check if the current process was started dynamically as a part of a GROW/ADD/REPLACE process set operation.
+
+---
+
+<br/>
 
 
 ---
@@ -571,6 +615,8 @@ end subroutine pf_dynprocs_psetop2str
 ```
 
 Return the name of the given process set operation as a string.
+
+---
 
 
 </div>

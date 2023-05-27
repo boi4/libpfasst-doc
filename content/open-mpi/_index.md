@@ -225,6 +225,8 @@ Furthermore, process set names are terminated by filling the rest of the string 
 
 **PSet Data Routines**
 
+---
+
 ```f90
 interface
 subroutine MPI_Session_get_pset_data(session, pset_name , coll_pset_name, keys, nkeys, wait, info_used, ierror)
@@ -252,6 +254,12 @@ RETURN:
 Description:   Publishes a key-value pair in the dictionary associated with the given PSet name.
                The PSet name has to exist.
 ```
+
+---
+
+
+<br/>
+
 
 
 ---
@@ -284,14 +292,13 @@ Description:   Looks up a key-value pair in the dictionary associated with the g
 ```
 
 
-
-
 ---
 
 
-
-
 **PSet Operation Routines**
+
+
+---
 
 ```f90
 interface
@@ -324,9 +331,11 @@ Description:   Queries for pending PSet Operation invloving the specified PSet.
                If no pending PSet operation is found for the specified PSet, op will be set to MPI_PSETOP_NULL
 ```
 
-
 ---
 
+<br/>
+
+---
 
 ```f90
 interface
@@ -360,6 +369,10 @@ Description:   Requests the specified PSet Operation to be applied on the input 
                It is the callers responsibility to free the PSet names and the output_psets array.
 ```
 
+---
+
+
+<br/>
 
 
 ---
@@ -390,5 +403,7 @@ Description:   Indicates finalization of the PSet Operation.
                This only applies to PSet operations involving changes of resources:
                   -> MPI_PSETOP_{ADD, SUB; GROW, SHRINK, REPLACE}
 ```
+
+---
 
 </div>

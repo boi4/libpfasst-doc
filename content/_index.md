@@ -3,9 +3,9 @@ title = "Dynamic LibPFASST"
 +++
 # Documentation for Dynamic LibPFASST
 
-This page provides the documentation for my [interdisciplinary project](https://web.archive.org/web/20230520140608/https://www.cit.tum.de/en/cit/studies/degree-programs/master-informatics/interdisciplinary-project/) at the Technical University of Munich 2022-2023.
+Welcome to the documentation of dynamic LibPFASST, the first adaptive parallel-in-time library!
 
-The goal of the project was to add dynamic MPI support to *LibPFASST*, a Fortran library that implements the PFASST method.
+Dynamic LibPFASST was created during my [interdisciplinary project](https://web.archive.org/web/20230520140608/https://www.cit.tum.de/en/cit/studies/degree-programs/master-informatics/interdisciplinary-project/) at the Technical University of Munich 2022-2023.
 
 Many new software components were modified/created in the course of this project. You can use the links below or in the navigation bar to get to the documentation of the respective component.
 
