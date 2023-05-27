@@ -66,7 +66,7 @@ These implement resizing in the following fashion (see also the video at the top
    1. Create a `PSETOP_GROW` request with `ntime * num_new_timesteps` as the requested size.
    2. Wait for new global process set and delta process set to be returned by `MPI_Sessions_dyn_v2a_query_psetop`.
    3. Include the global process set name in the dict of the delta process set and finalize the process set operation.
-   4. New processes: Create a process set from their "mpi://WORLD" (delta pset for the old processes)
+   4. New processes: Create a process set grid from their "mpi://WORLD" (delta pset for the old processes)
    5. All processes: Create communicator from new global process set
    6. Rank 0 of each time process set of old and new processes: Send time process set name and space process set rank to global_rank 0.
    7. Rank 0 global communicator: Receive process set names for each space partition. Create unions from old and new time process sets and use the space rank for matching (so all processes in a time process set work on the same space domain). Send union process set names back to the respective processes.
