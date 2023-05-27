@@ -13,5 +13,5 @@ Heat Equation on a square zero boundary condition, sine initial condition
     </video>
 </div>
 <figcaption class="figure-caption" style="text-align: center; margin-bottom: 2em; margin-top: 1em">
-    Animated visualization of adaptive LibPFASST solving the 2d Heat Equation.
+    Animated visualization of adaptive LibPFASST solving the 2D Heat Equation.
 </figcaption>

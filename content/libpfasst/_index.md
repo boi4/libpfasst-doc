@@ -18,7 +18,7 @@ It has the following features and limitations:
 
 * Ability to dynamically grow and shrink regular PFASST runs by an arbitrary number of processes. Note that the limitations of the runtime (resize granularity, universe size, ...) apply.
 * Ability to dynamically grow and shrink the time dimension in space-parallel PFASST runs ([see showcase](@/showcase/_index.md)).
-* New hooks for resize related events. Provides flexibility and extendebility to user applications.
+* New hooks for resize related events. Provides flexibility and extendability to user applications.
 * LibPFASST runs (also static ones) do not require anymore that the number of timesteps is a multiple of the size of the main communicator.
 
 </div>
@@ -53,7 +53,7 @@ To use LibPFASST, a user must:
 * Implement a **sweeper class**. This class actually defines the specific differential equation that should be solved
 * Implement a **main routine** that sets up and calls LibPFASST
 
-Basically all examples in the official LibPFASST repo also implement a **probin module**, which loads general PFASST and problem specific parameters from a `probin.nml` file.
+Basically all examples in the official LibPFASST repository also implement a **probin module**, which loads general PFASST and problem specific parameters from a `probin.nml` file.
 
 In this version of LibPFASST, the user should additionally add a **resizing routine**, in which the application decides on the current state whether to grow or shrink and add it to the the `PF_PRE_POT_RESIZE` hook. See below ("Controlling dynamic resources") for details.
 
@@ -66,14 +66,14 @@ Parallel-in-Time methods such as LibPFASST have some useful properties that make
 These properties include:
 
 * **Orthogonality to space parallelization**: Parallel-in-Time methods can be combined with methods that parallelize in the space dimension ([see showcase](@/showcase/_index.md)).
-The space parallelization is usually very loosely coupled to the time paralellization. Because of that, an application where it is difficult to adapt dynamically in space, can simply adapt in the time dimension only.
-* **Low inter-block dependence**: Most of these methods work on a fixed set of timesteps which are dependent on the number of processors available. As a consequence, to solve more steps, they split up the total work into little blocks, which are worked on consecutively.
-As these blocks are worked on step-by-step, this creates a good moment for resource resizing. Furthermore, the next block usually only depends on the solution of the previous block, so no complex data synchronzation is needed when new processes arrive.
+The space parallelization is usually very loosely coupled to the time parallelization. Because of that, an application where it is difficult to adapt dynamically in space, can simply adapt in the time dimension only.
+* **Low inter-block state**: Most of these methods work on a fixed set of time steps which are dependent on the number of processors available. As a consequence, to solve more steps, they split up the total work into little blocks, which are worked on consecutively.
+As these blocks are worked on step-by-step, the transition to the next block is a good moment for resource resizing. Furthermore, the next block usually only depends on the solution of the previous block, so no complex data synchronization is needed when new processes arrive.
 * **Lack of rebalancing need**: In a space parallel application, the domain is usually partitioned equally among all processors. Once there is a resize, the processors must repartition the space in a smart way and redistribute partial results. This can often become quite complex. In Parallel-in-Time applications however, this is not necessary, as the time domain is a single dimension that is worked on step by step.
 
 
 These properties are the main motivation to apply dynamic resources to LibPFASST.
-This project demonstates that with these types of libraries, little work is required to add dynamic resources support and that it adds great value to the application.
+This project demonstrates that with these types of libraries, little work is required to add dynamic resources support and that it adds great value to the application.
 
 
 ## Rank Order Preservation Assumption
@@ -86,8 +86,8 @@ For example, after a `GROW` pset operation, the application can not assume that 
 This is bad, as you would usually try to synchronize data using `MPI_Bcast`, but you would have to come up with a root rank first.
 In an ordered setting, we know that rank 0 will remain the same process in both the old and the merged process sets, which makes process coordination much simpler.
 
-In this version of LibPFASST specifically, both `GROW` and `SHRINK` (in the space-parallel case `UNION` and `DIFFERENCE`) are used to grow and shrink.
-Furthermore, we need grid consistency after a resource change (so that processes in the same space pset are working on the same time step). Also, for a lot of coordination, assumptions on the rank of processes are made.
+In this version of LibPFASST specifically, both `GROW` and `SHRINK` (in the space-parallel case `UNION` and `DIFFERENCE`) are used to resize the LibPFASST run.
+Furthermore, we need grid consistency after a resource change (so that processes in the same space pset are working on the same time step). Also, for a lot of coordination , assumptions on the rank of processes are made. For example, when choosing the root rank of a broadcast.
 
 The following is an illustration of how this would look like (`GROW` and `SHRINK` work analogously to `UNION` and `DIFFERENCE`):
 
@@ -135,33 +135,98 @@ This will create a file in `lib/libpfasst.a` and Fortran module files in `includ
 
 
 
-#### Using dynamic resources
+#### Basic workflow using dynamic resources
 
-Traditionally, a typical application using LibPFASST would look like this:
-With the 
+Traditionally, a typical LibPFASST main routine would look like this:
 
-`pf%use_dynprocs`
+1. create a LibPFASST communicator (of type `pf_comm_t`) from an MPI communicator using `pf_mpi_create`
+2. create pfasst structure using `pf_pfasst_create`
+3. set up additional LibPFASST things using `pf_pfasst_setup`
+4. start PFASST run using `pf_pfasst_run`
+
+This approach can still be used in this version of LibPFASST.
+However, if you want to use dynamic resources, you need to setup PFASST a bit differently:
+
+0. find out if the process was started dynamically by calling `pf_dynprocs_check_dynamic`
+1. instead of a `pf_comm_t` object, create a `dynprocs_t` object using `pf_dynprocs_create`
+2. create pfasst structure using `pf_pfasst_create_dynamic` instead of `pf_dynprocs_create`
+3. set up additional LibPFASST things using `pf_pfasst_setup`
+4. start PFASST run using `pf_pfasst_run`, additionally passing `join_existing` (set if process is dynamic start) and `premature_exit` (on return will be set to true if pfasst run is not yet finished)
+
+Note that `pf%use_dynprocs` will be set if you use the dynamic setup routines.
+
+To see a more extensive descriptions of these functions, including their arguments, take a look at the API reference at the bottom of this page.
+
+The workflow for "space-parallel mode" is described in the [showcase section](@/showcase/_index.md).
 
 
-#### Determining the location of the final result
+#### When returning from `pf_pfasst_run`
 
-Do not assume that communicators that were used before starting LibPFASST are still valid.
+When returning from `pf_pfasst_run` it is important to note the following:
 
-Use `pf%comm%comm` to coordinate.
+1. previous communication structures (communicators/groups/process sets) might have become invalid
+2. the return does not imply that the run is finished. It might be that the process is part of a SHRINK/SUB pset operation
+3. if the run is finished, it is unclear which process exactly will hold the final solution
 
-Check `pf%state%step`. It should be equal to `nsteps-1`. This is the process with the final solution.
+Thus, you should adapt your code to be able to handle these problems:
+
+1. use `pf%comm%comm` and process sets from `pf%dynprocs` to continue communication, if it is required
+2. check the value of the `premature_exit` argument to `pf_pfasst_run`. Do not create any communication when it is set and try to stop the process as soon as possible
+3. the value of the last step will be at the process that worked on the final time step. Check `pf%state%step`. If is is equal to `nsteps-1`, this is the process with the final solution
 
 
 #### Controlling dynamic resources
 
-Traditionally, a typical application using LibPFASST would look like this:
-With the 
+LibPFASST has the ability to grow and shrink the number of parallel-in-time time steps after each block that is worked on.
+However, the decision on whether to grow, shrink or keep the number of processes is made by the user.
 
+The user should provide a pfasst hook attached to `PF_PRE_POT_RESIZE`.
+This hook is called once on each process right before the application can request resources.
+
+In this hook, the user should set the value of `pf%dynprocs%resize_delta` to the number of time steps LibPFASST should grow or shrink.
+When removing resources, it should be set to a negative value.
+The value of `pf%dynprocs%resize_delta` is reset to zero after is has been processed. Only the value at the main resource change process (rank 0 of the main_pset or rank 0 of the global pset) matters.
+
+In a normal PFASST run, this the number of processes to be added/removed is equal to the absolute value of `pf%dynprocs%resize_delta`.
+In a "space-parallel" setting, the number of processes is equal to the above value times the number of parallel pfasst instances.
+
+For example:
+
+* to shrink LibPFASST by **2** time steps in a normal run, set `pf%dynprocs%resize_delta` to **-2**. A SHRINK pset operation will be made to remove a total of **2** processess
+* to grow LibPFASST by **3** time steps in a space-parallel run with **9** parallel LibPFASST instances, set `pf%dynprocs%resize_delta` to **3**. A SHRINK pset operation will be made to remove a total of **27** processess
+
+Note that the number of time steps can never reach 0 or less, the user should double check this.
+
+An example routine for resizing might look like this:
+
+```f08
+subroutine resize_decider(pf, level_index)
+  type(pf_pfasst_t), intent(inout) :: pf
+  integer, intent(in) :: level_index
+
+  integer :: max_timesteps = 8
+  integer :: cur_timesteps
+  integer :: new_timesteps
+  real    :: u
+
+  ! we only set resize_delta at the process that calls the psetop
+  if (pf%rank == 0 .and. ((.not. pf%dynprocs%global_used) .or. pf%dynprocs%horizontal_rank == 0)) then
+      cur_timesteps = pf%comm%nproc
+      ! get random integer between 1 and max_timesteps
+      call random_number(u)
+      new_timesteps = 1 + floor(u * (max_timesteps + 1 - 1))
+      pf%dynprocs%resize_delta = new_timesteps - cur_timesteps
+  end if
+end subroutine resize_decider
+```
+
+This routine sets the `pf%dynprocs%resize_delta` to a value so that the number of time steps are changed to a random number between 2 and `max_timesteps`.
+This routine also works in both normal and "space-parallel mode" due to the check on `pf%dynprocs%global_used` in the if-expression.
 
 
 #### New hooks
 
-The following are the new LibPFASST hooks available related to dynamic resources:
+The following are additional LibPFASST hooks related to dynamic resources:
 
 <div style="overflow-x:auto;">
 
@@ -179,20 +244,36 @@ The following are the new LibPFASST hooks available related to dynamic resources
 
 All hooks are called with the level parameter set to 1. It should be ignored by the application.
 
-Please refer to the offical LibPFASST documentation for the usage of hooks.
+Please refer to the official LibPFASST documentation for the usage of hooks.
 
 
 
-## Dynamic PFASST Example
+#### Dynamic PFASST Example
 
-TODO
+
+The new LibPFASST repository contains [a simple example](https://github.com/boi4/LibPFASST/tree/dynprocs2a/Tutorials/EX6_dynamic_mpi) that is a modified version of the advection-diffusion example with dynamic resizing enabled.
+It can be used as a reference for using dynamic LibPFASST.
+
+If you are using the docker setup, the example is available at `/opt/hpc/build/LibPFASST/Tutorials/EX6_dynamic_mpi` and it can be compiled by running `make` in that directory.
+To run the script on 8 hosts with 4 processes per host, you can use the following command:
+
+```
+mpirun --mca btl_tcp_if_include eth0 -np 8 --host 'n01:4,n02:4,n03:4,n04:4,n05:4,n06:4,n07:4,n08:4' ./main.exe probin.nml
+```
+
+To get more verbose output, you can run it like this:
+
+```
+mpirun --mca btl_tcp_if_include eth0 -np 8 --host 'n01:4,n02:4,n03:4,n04:4,n05:4,n06:4,n07:4,n08:4' ./main.exe probin.nml debug=.true.
+```
+
+The application can figure out the node granularity automatically and will only grow/shrink by a multiple of it (4 in the above commands).
 
 
 
 ## Implementation Details
 
-
-The main changes occured in the following source files:
+The main changes occurred in the following source files:
 
 <div style="overflow-x:auto;">
 
@@ -201,22 +282,31 @@ The main changes occured in the following source files:
 |`pf_dtype.f90`    | Introduction of new `pf_dynprocs_t` types and minor edits to `pf_pfasst_t`                              |
 |`pf_dynprocs.f90` | New module containing user-facing routines and internal resize logic                                    |
 |`pf_parallel.f90` | Modifications to `pf_pfasst_run` and `pf_block_run` to allow resizing and dynamic starts and shutdowns. |
-|`pf_hooks.f90`    | Introduction of new hooks related to application resizing  TODO!!!!!!!!!                                |
-|`pf_results.f90`  | Result arrays are have bigger allocation sizes as number of PFASST blocks is unknown a-priori           |
+|`pf_hooks.f90`    | Introduction of new hooks related to application resizing                                               |
+<!--|`pf_results.f90`  | Result arrays are have bigger allocation sizes as number of PFASST blocks is unknown a-priori           |-->
 
 </div>
 <br />
 
 
 
-<!-- TODO: maybe draw a sequence diagram of both resource addition and resource removal -->
+#### LibPFASST block mode
 
+In LibPFASST, the total number of time steps to compute is split up into blocks.
+Each block has the size of the number of time steps that can be worked on parallel in time.
+These blocks are being worked on sequentially.
 
-#### PFASST block mode
+Without dynamic resources, each block will have the same size and from the beginning, the total number of blocks is known.
+This assumptions is reflected in multiple places in the original source code.
 
+For this project, the code was modified to remove that assumption, so that the number and size of blocks can change dynamically.
+The main loop over the blocks is contained in the `pf_block_run` function (`src/pf_parallel.f90`).
+This loop was changed from a `do k = 1,nblocks` loop to a `do while` loop.
+Additionally, in the final block, the number of processes might be higher than the number of time steps left.
+In this case, only a subset of processes work, and the unused process return.
 
+Finally, to implement dynamic resizing, `pf_dynprocs_resize` is called at the beginning of each new block (except for the first one).
 
-#### Internal functions
 
 
 
@@ -279,7 +369,7 @@ end type pf_dynprocs_t
 An object of this type is available in the `pf_pfasst_t` type under the `dynprocs` attribute (usually accessed via `pf%dynprocs`).
 Additionally, `pf_pfasst_t` contains a flag `is_dynamic` that indicates whether this is a dynamic LibPFASST run and whether `pf%dynprocs` is actually accessible.
 
-First of all, the `dynprocs_t` stores up to three process sets and communicators with rank and size:
+The `dynprocs_t` stores up to three process sets together with the respective communicator, rank and size:
 
 1. The `main_pset`. This is the process set where actual PFASST communication takes place. Note that the communicator and other attributes are stored at a different place at `pf%comm%comm`, `pf%rank`, `pf%comm%nproc`.
 
@@ -295,15 +385,45 @@ Finally, `resize_delta`, the only variable that the application should set by it
 
 
 
-#### Resizing
+#### Resizing Routines
 
+The main module for resizing is the `pf_mod_dynprocs` module in `src/pf_dynprocs.f90`.
+This module contains routines that can be called by the user, generic helper routines related to process sets/MPI sessions and finally internal routines that should not be called by the user.
+
+
+<div style="overflow-x:auto;">
+
+| Routine | Type | Description |
+|-|-|-|
+| `pf_dynprocs_create` | public | constructor for `dynprocs_t` |
+| `pf_pfasst_create_dynamic` | public | like `pf_pfasst_create`, but for dynamic runs. Also creates communication with existing run in case of a dynamic start |
+| `pf_dynprocs_comm_from_pset` | helper | create a communicator from a process set |
+| `pf_dynprocs_pset_contains_me` | helper | check if a process set contains the current process |
+| `pf_dynprocs_check_dynamic` | helper | check if this process was started dynamically |
+| `pf_dynprocs_create_comm` | internal | create LibPFASST communicator from main process set. Called by `pf_pfasst_create_dynamic` |
+| `pf_dynprocs_get_shrink_union` | internal | Use process set operations to create a delta process set to remove from the run |
+| `pf_dynprocs_handle_shrink_global` | internal | In a space-parallel run, update main psets on each LibPFASST instance when shrinking  |
+| `pf_dynprocs_handle_shrink_grow` | internal | In a space-parallel run, update main psets on each LibPFASST instance when growing  |
+| `pf_dynprocs_apply_rc` | internal | Apply a resource change that arrived from the runtime. Update psets and communicators |
+| `pf_dynprocs_suggest_rc` | internal | Request a resource change using GROW/SHRINK process set operations. |
+| `pf_dynprocs_resize` | internal | Potentially request a resource change, check for a resource change and apply a resource change. |
+| `pf_dynprocs_join_run` | internal | Join an existing run. Sync up the state |
+| `pf_dynprocs_check_rc` | internal | Check for a pending resource change |
+| `pf_dynprocs_check_shutdown` | internal | Check if current process must shut down (part of a shrinking delta process set) |
+| `pf_dynprocs_sync_state` | internal | Broadcast current state from rank 0. Called by `pf_dynprocs_apply_rc` and `pf_dynprocs_join_run` |
+
+</div>
+<br />
+
+
+The complete reference for the user-facing routines is available at the bottom of this page.
 
 
 #### State Syncing
 
 There are two types of states in LibPFASST:
 
-1. **Static state**: This is the type of state that is alread determined when LibPFASST is entering the block mode.
+1. **Static state**: This is the type of state that is already determined when LibPFASST is entering the block mode.
 For example, static state contains configuration parameters and local variables that are initialized deterministically.
 Note that each new process will be spawned with the same command line, and thus with the same configuration options (given that the configuration files did not change on disk).
 Static state does not need to be synchronized with new processes.
@@ -350,5 +470,107 @@ This hook should behave similarly to the `pf_dynprocs_sync_state` routine in the
 
 
 <div id="f90API" class="collapse">
-asdf
+
+The following routines are part of the `pf_mod_dynprocs` module (`src/pf_dynprocs.f90`).
+
+**Main Routines**
+
+```f90
+subroutine pf_dynprocs_create(this, session, main_pset, global_pset, horizontal_pset)
+  type(pf_dynprocs_t), intent(out)          :: this
+  integer            , intent(in)           :: session
+  character(len=*)   , intent(in)           :: main_pset
+  character(len=*)   , intent(in), optional :: global_pset
+  character(len=*)   , intent(in), optional :: horizontal_pset
+end subroutine pf_dynprocs_create
+```
+
+Constructs a new `dynprocs_t` object.
+The `main_pset` is the process set used for time parallel communication.
+
+When running LibPFASST in "space-parallel mode", both `global_pset` and `horizontal_pset` must be given as well.
+`global_pset` is a process set that contains the processes from all parallel LibPFASST runs.
+`horizontal_pset` is a process set that contains the processes from all parallel LibPFASST runs that will work on the same time step as the current process.
+The different `main_pset` and `horizontal_pset` arguments create a grid on top of `global_pset`. See [the showcase page](@/showcase/_index.md) for a explanation of this.
+
+
+---
+
+```f90
+subroutine pf_dynprocs_destroy(this)
+  type(pf_dynprocs_t), intent(out)   :: this
+end subroutine pf_dynprocs_destroy
+```
+
+Destructs a `dynprocs_t` object. Note that the MPI Session given in the constructor must be finalized by the user.
+
+---
+
+```f90
+subroutine pf_pfasst_create_dynamic(pf, dynprocs, nlevels, fname, nocmd)
+  type(pf_pfasst_t),   intent(inout)        :: pf
+  type(pf_dynprocs_t), intent(in), target   :: dynprocs
+  integer,             intent(in), optional :: nlevels
+  character(len=*),    intent(in), optional :: fname
+  logical,             intent(in), optional :: nocmd
+end subroutine pf_pfasst_create_dynamic
+```
+
+Create a new `pf_pfasst_t` object in a dynamic LibPFASST setting.
+This routine behaves very similar to `pf_pfasst_create`, but takes a `pf_dynprocs_t` argument instead of a `pf_comm_t`.
+This routine will point `pf%dynprocs` to the given `dynprocs` argument and will set `pf%is_dynamic`.
+Furthermore, this routine established communication from the process sets contained within `dynprocs` and will also establish communication to an existing LibPFASST run if the process was started dynamically.
+
+
+
+**Generic Helper Routines**
+
+The following routines are not PFASST specific and are provided as helpers for internal routines, but can also be used by the user for convenience.
+
+```f90
+subroutine pf_dynprocs_comm_from_pset(session, pset, comm)
+   integer,          intent(in)  :: session
+   character(len=*), intent(in)  :: pset
+   integer,          intent(out) :: comm
+end subroutine pf_dynprocs_comm_from_pset
+```
+
+Create an MPI communicator from the given process set.
+Combines `MPI_Group_from_session_pset` and `MPI_Comm_create_from_group`.
+
+---
+
+```f90
+subroutine pf_dynprocs_pset_contains_me(session, pset, contains_me)
+   integer,          intent(in)  :: session
+   character(len=*), intent(in)  :: pset
+   logical,          intent(out) :: contains_me
+end subroutine pf_dynprocs_pset_contains_me
+```
+
+Check if the process set `pset` contains the current process.
+
+---
+
+```f90
+subroutine pf_dynprocs_check_dynamic(session, is_dynamic)
+  integer, intent(in)  :: session
+  logical, intent(out) :: is_dynamic
+end subroutine pf_dynprocs_check_dynamic
+```
+
+Check if the current process was started dynamically as a part of a GROW/ADD/REPLACE process set operation.
+
+
+---
+```f90
+subroutine pf_dynprocs_psetop2str(psetop, str)
+  integer,          intent(in)  :: psetop
+  character(len=*), intent(out) :: str
+end subroutine pf_dynprocs_psetop2str
+```
+
+Return the name of the given process set operation as a string.
+
+
 </div>

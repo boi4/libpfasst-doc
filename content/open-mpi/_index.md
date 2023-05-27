@@ -33,7 +33,7 @@ Also, the non-blocking variants of the MPI Sessions API (`MPI_Session_dyn_v2a_ps
 </div>
 
 <div class="alert alert-warning position-static" role="alert">
-  Warning: As of May 2023, the implementation (both for C and Fortran) only allows growing and shrinking in a node-wise granularity. If, for example, you are running a job on several nodes with 8 reserved processes each, you can only grow and shrink by a multiple 8 processes at once.
+  Warning: As of May 2023, the implementation (both for C and Fortran) only allows growing and shrinking in a node-wise granularity. If, for example, you are running a job on several nodes with 8 reserved processes each, you can only grow and shrink by a multiple of 8 processes at once.
 </div>
 
 
@@ -61,7 +61,7 @@ unzip spack_packages.zip
 ```bash
 module load user_spack
 ```
-4. Create your own spack reop:
+4. Create your own spack repo:
 ```
 mkdir -p ~/spack_repos
 spack repo create ~/spack/repos/mine
