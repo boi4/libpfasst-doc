@@ -9,7 +9,7 @@ Dynamic LibPFASST was created during my [interdisciplinary project](https://web.
 
 Many new software components were modified/created in the course of this project. You can use the links below or in the navigation bar to get to the documentation of the respective component.
 
- - [Open MPI](@/open-mpi/_index.md): Patrick Huber's dynamic Open MPI fork was extended with a Fortran interface.
+ - [Open MPI](@/open-mpi/_index.md): Dominik Huber's dynamic Open MPI fork was extended with a Fortran interface.
  - [LibPFASST](@/libpfasst/_index.md): MPI Sessions and resizing support were added to LibPFASST
  - [Showcase](@/showcase/_index.md): An example application running on dynamic LibPFASST was developed
  - [Tools](@/tools/_index.md): Tools that help to debug and visualize applications using dynamic resources
