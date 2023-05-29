@@ -44,7 +44,7 @@ Alternatively, you can also try to manually build the components: [prrte](https:
 [openpmix](https://gitlab.inria.fr/dynres/dyn-procs/openpmix),
 [ompi](https://gitlab.inria.fr/dynres/dyn-procs/ompi).
 
-For development, it might help to enable debug symbols within Open MPI. To enable these, add the `--enable-debug` flag in the Open MPI configure command in `install_docker.sh`.
+For development, it might help to enable debug symbols within Open MPI and other runtime libraries. To enable these, add the `--enable-debug` flag when running `install_docker.sh`.
 
 
 
