@@ -520,7 +520,7 @@ The different `main_pset` and `horizontal_pset` arguments create a grid on top o
 
 ```f90
 subroutine pf_dynprocs_destroy(this)
-  type(pf_dynprocs_t), intent(out)   :: this
+  type(pf_dynprocs_t), intent(inout)   :: this
 end subroutine pf_dynprocs_destroy
 ```
 
