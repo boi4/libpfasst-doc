@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Dynamic LibPFASST</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LibPFASST dynamic resources documentation" />
+  <meta name="keywords" content="HPC,Parallel-in-Time" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- bootstrap css -->
+  <link href="https://fecht.cc/libpfasst-doc/bootstrap-5.3.0.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+<style>
+/* flip the arrow when the content is collapsed */
+.collapsed .togglearrow {
+  transform: rotate(90deg);
+  display: inline-block;
+}
+.togglearrow {
+  transform: rotate(180deg);
+  color: black;
+  display: inline-block;
+}
+
+td {
+  padding: 0 15px;
+}
+th {
+  padding: 0 15px;
+}
+
+/* search results */
+.search-container {
+  display: inline-block;
+  position: relative;
+  width: 300px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.search-results {
+  display: none;
+  position: absolute;
+  background: white;
+  color: black;
+  padding: 1rem;
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.5);
+  max-height: 500px;
+  overflow: auto;
+  width: 150%;
+  right: 0;
+}
+
+/* Search results on mobile have 100% width*/
+@media (max-width: 767px) {
+  .search-results {
+    width: 100%;
+  }/* SM breakpoint */
+
+  /* CUSTOM WIDTHS */
+  .w-md-25 { width: 25%!important; }
+  .w-md-50 { width: 50%!important; }
+  .w-md-75 { width: 75%!important; }
+  .w-md-100 { width: 100%!important; }
+}
+
+.search-results__items {
+  list-style: none;
+}
+
+
+.search-results__items > li {
+  margin-top: 1rem;
+  border-bottom: 1px solid #ccc;
+  font-size: 0.9rem;
+
+}
+.search-results__items li:first-of-type {
+  margin-top: 0;
+}
+
+.search-results__item {
+  margin-bottom: 1rem;
+}
+
+.search-results__item > a {
+  font-size: 1.2rem;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+
+.text-muted > a {
+  color: var(--bs-secondary-color) !important;
+}
+
+</style>
+</head>
+
+<body>
+
+  <div class="container border pt-3 my-3">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light px-2" style="background-color: #e3f2fd;">
+
+      <a class="navbar-brand" href="https://fecht.cc/libpfasst-doc/">Dynamic LibPFASST</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/open-mpi/">Open MPI</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/libpfasst/">LibPFASST</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/showcase/">Showcase</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/tools/">Tools</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/libmpidynres/">libmpidynres</a>
+          </li>
+        </ul>
+
+
+        <div class="search-container navbar-form navbar-right mx-2">
+            <input id="search" type="search" placeholder="🔎 Search this site" aria-label="Search">
+
+            <div class="search-results">
+                <div class="search-results__items"></div>
+            </div>
+        </div>
+      </div> <!-- End of Collapse -->
+    </nav>
+
+    <!-- content -->
+    <div class="pt-3">
+      
+      <h1 id="documentation-for-dynamic-libpfasst">Documentation for Dynamic LibPFASST</h1>
+<p>Welcome to the documentation of dynamic LibPFASST, the first adaptive parallel-in-time library!</p>
+<p>Dynamic LibPFASST was created during my <a rel="noopener" target="_blank" href="https://web.archive.org/web/20230520140608/https://www.cit.tum.de/en/cit/studies/degree-programs/master-informatics/interdisciplinary-project/">interdisciplinary project</a> at the Technical University of Munich 2022-2023.</p>
+<p>Many new software components were modified/created in the course of this project. You can use the links below or in the navigation bar to get to the documentation of the respective component.</p>
+<ul>
+<li><a href="https://fecht.cc/libpfasst-doc/open-mpi/">Open MPI</a>: Dominik Huber's dynamic Open MPI fork was extended with a Fortran interface.</li>
+<li><a href="https://fecht.cc/libpfasst-doc/libpfasst/">LibPFASST</a>: MPI Sessions and resizing support were added to LibPFASST</li>
+<li><a href="https://fecht.cc/libpfasst-doc/showcase/">Showcase</a>: An example application running on dynamic LibPFASST was developed</li>
+<li><a href="https://fecht.cc/libpfasst-doc/tools/">Tools</a>: Tools that help to debug and visualize applications using dynamic resources</li>
+<li><a href="https://fecht.cc/libpfasst-doc/libmpidynres/">libmpidynres</a>: A Fortran interface was added to libmpidynres, an emulation layer for MPI Sessions and process sets.</li>
+</ul>
+<p>For questions about this project, feel free to <a rel="noopener" target="_blank" href="https://fecht.cc">contact me</a>.<br/>
+If you want to learn more about dynamic MPI or would like to contribute, please reach out to <a rel="noopener" target="_blank" href="https://www.ce.cit.tum.de/caps/mitarbeiter/dominik-huber/">Domink Huber</a> or <a rel="noopener" target="_blank" href="https://www.martin-schreiber.info/">Prof. Martin Schreiber</a>.</p>
+<p>The source code repository of this documentation <a rel="noopener" target="_blank" href="https://github.com/boi4/libpfasst-doc">can be found on Github</a>.
+It was written in May 2023.</p>
+<h4 id="acknowledgements">Acknowledgements</h4>
+<p>I would like to thank Dominik for always lending a helping hand when I ran into issues with the runtime.
+Also, I want to thank Martin for fruitful discussions and being a great supervisor.</p>
+
+      
+    </div>
+
+
+  </div> <!-- End of Container -->
+
+  <!-- Footer -->
+  <div class="container mb-3">
+    <div class="text-muted">TUM Interdisciplinary Project, Jan Fecht, 2023. pictures & videos: <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">CC BY 3.0</a>, code snippets: <a rel="license" href="https://opensource.org/license/mit/">MIT</a></div>
+  </div>
+
+  <script src="https://fecht.cc/libpfasst-doc/bootstrap.bundle-5.3.0.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"></script>
+  <script src="https://fecht.cc/libpfasst-doc/elasticlunr.min.js"></script>
+  <script src="https://fecht.cc/libpfasst-doc/search.js"></script>
+  <script>
+// initialize search
+if (document.readyState === "complete" ||
+    (document.readyState !== "loading" && !document.documentElement.doScroll)
+) {
+  initSearch("https://fecht.cc/libpfasst-doc/");
+} else {
+  document.addEventListener("DOMContentLoaded", () => {initSearch("https://fecht.cc/libpfasst-doc/")});
+}
+  </script>
+</body>
+
+</html>

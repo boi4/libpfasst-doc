@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+Allow: /
+Sitemap: https://fecht.cc/libpfasst-doc/sitemap.xml

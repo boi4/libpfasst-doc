@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>libmpidynres</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LibPFASST dynamic resources documentation" />
+  <meta name="keywords" content="HPC,Parallel-in-Time" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- bootstrap css -->
+  <link href="https://fecht.cc/libpfasst-doc/bootstrap-5.3.0.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+<style>
+/* flip the arrow when the content is collapsed */
+.collapsed .togglearrow {
+  transform: rotate(90deg);
+  display: inline-block;
+}
+.togglearrow {
+  transform: rotate(180deg);
+  color: black;
+  display: inline-block;
+}
+
+td {
+  padding: 0 15px;
+}
+th {
+  padding: 0 15px;
+}
+
+/* search results */
+.search-container {
+  display: inline-block;
+  position: relative;
+  width: 300px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.search-results {
+  display: none;
+  position: absolute;
+  background: white;
+  color: black;
+  padding: 1rem;
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.5);
+  max-height: 500px;
+  overflow: auto;
+  width: 150%;
+  right: 0;
+}
+
+/* Search results on mobile have 100% width*/
+@media (max-width: 767px) {
+  .search-results {
+    width: 100%;
+  }/* SM breakpoint */
+
+  /* CUSTOM WIDTHS */
+  .w-md-25 { width: 25%!important; }
+  .w-md-50 { width: 50%!important; }
+  .w-md-75 { width: 75%!important; }
+  .w-md-100 { width: 100%!important; }
+}
+
+.search-results__items {
+  list-style: none;
+}
+
+
+.search-results__items > li {
+  margin-top: 1rem;
+  border-bottom: 1px solid #ccc;
+  font-size: 0.9rem;
+
+}
+.search-results__items li:first-of-type {
+  margin-top: 0;
+}
+
+.search-results__item {
+  margin-bottom: 1rem;
+}
+
+.search-results__item > a {
+  font-size: 1.2rem;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+
+.text-muted > a {
+  color: var(--bs-secondary-color) !important;
+}
+
+</style>
+</head>
+
+<body>
+
+  <div class="container border pt-3 my-3">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light px-2" style="background-color: #e3f2fd;">
+
+      <a class="navbar-brand" href="https://fecht.cc/libpfasst-doc/">Dynamic LibPFASST</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/open-mpi/">Open MPI</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/libpfasst/">LibPFASST</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/showcase/">Showcase</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/tools/">Tools</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link active" href="https://fecht.cc/libpfasst-doc/libmpidynres/">libmpidynres</a>
+          </li>
+        </ul>
+
+
+        <div class="search-container navbar-form navbar-right mx-2">
+            <input id="search" type="search" placeholder="🔎 Search this site" aria-label="Search">
+
+            <div class="search-results">
+                <div class="search-results__items"></div>
+            </div>
+        </div>
+      </div> <!-- End of Collapse -->
+    </nav>
+
+    <!-- content -->
+    <div class="pt-3">
+      
+      <h2 id="libmpidynres">libmpidynres</h2>
+<p><strong>libmpidynres</strong> is a library that provides an emulation layer for dynamic resources in MPI based on <code>MPI_COMM_WORLD</code>.
+It was implemented as a part of the bachelor thesis <em>A Simulation Layer for Dynamic Resources with MPI Sessions</em> (2020).
+It is based on an early MPI Sessions API for dynamic resources which is documented extensively in section 5 of the thesis (<a rel="noopener" target="_blank" href="https://fecht.cc/public/ba.pdf">download</a>).
+More information can also be found in <em>An Emulation Layer for Dynamic Resources with MPI Sessions</em> by Fecht et. al (2022).</p>
+<p>The main idea of <strong>libmpidynres</strong>:</p>
+<ul>
+<li>the user includes both <code>mpi.h</code> and <code>mpidynres.h</code> header files (in C) or the Fortran modules described below</li>
+<li><strong>limpidynres</strong> provides an MPI Sessions interface very similar to the interface that was released in MPI-4</li>
+<li>additionally, <strong>libmpidyres</strong> provides an interface to deal with changing number of resources (i.e. processes)</li>
+<li>the user only uses <code>MPI</code> communicators that are based on the ones provided by <strong>libmpidynres</strong> functions (<code>MPI_COMM_WORLD</code> is hidden from the user)</li>
+<li><strong>libmpidynres</strong> starts and shuts down application processes using <code>MPI_COMM_WORLD</code></li>
+</ul>
+<p>The source code of <em>libmpidynres</em> can be found on <a rel="noopener" target="_blank" href="https://github.com/boi4/libmpidynres">GitHub</a>.</p>
+<div class="alert alert-warning position-static" role="alert">
+  Warning: libmpidynres is not compatible with newer MPI implementations due to naming conflicts. If you use Open MPI, make sure to use Open MPI version v4.1.5 or below.
+</div>
+<h3 id="fortran-extension-documentation">Fortran Extension Documentation</h3>
+<p>To support Fortran applications like <code>LibPFASST</code>, <strong>libmpidynres</strong> was extended with a Fortran interface.</p>
+<p>To compile <strong>libmpidynres</strong> with Fortran support, use:</p>
+<pre data-lang="bash" style="background-color:#fafafa;color:#383a42;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#e45649;">git</span><span> clone</span><span style="color:#e45649;"> --branch</span><span> fortran https://github.com/boi4/libmpidynres.git
+</span><span>
+</span><span style="color:#a0a1a7;"># build libmpidynres
+</span><span style="color:#e45649;">make -C</span><span> libmpidynres
+</span></code></pre>
+<p>When compiling <strong>libmpidynres</strong> with the instructions above, the Fortran routines are linked together with the C routines into a single shared library at <code>libmpidynres/build/lib/libmpidynres.so</code>.
+Additionally, four Fortran modules are built into <code>libmpidynres/build/include/</code> (<code>mpidynres.mod</code>, <code>mpidynres_f08.mod</code>, <code>mpidynres_sim.mod</code>, <code>mpidynres_f08.mod</code>).
+These can be installed into the system by running <code>sudo make -C libmpidynres install</code>.</p>
+<p>To use the <strong>libmpidynres</strong> in Fortran, an application wrapper must be created.
+A typical application wrapper in <em>Fortran 2008</em> might look like this:</p>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">PROGRAM </span><span style="color:#0184bc;">main
+</span><span>  </span><span style="color:#a626a4;">use mpidynres_sim_f08
+</span><span>  </span><span style="color:#a626a4;">use app
+</span><span>  </span><span style="color:#a626a4;">implicit none
+</span><span>
+</span><span>  type(MPIDYNRES_SIM_CONFIG) </span><span style="color:#a626a4;">::</span><span> config
+</span><span>  integer </span><span style="color:#a626a4;">::</span><span> ierror,world_si</span><span style="color:#c18401;">ze
+</span><span>  procedure(mpidynres_main_func), pointer </span><span style="color:#a626a4;">::</span><span> main_func </span><span style="color:#a626a4;">=&gt;</span><span> app_main
+</span><span>
+</span><span>  </span><span style="color:#a626a4;">call </span><span style="color:#0184bc;">MPI_INIT</span><span>(ierror)
+</span><span>  config</span><span style="color:#a626a4;">%</span><span>base_communicator </span><span style="color:#a626a4;">=</span><span> MPI_COMM_WORLD
+</span><span>  </span><span style="color:#a626a4;">call </span><span style="color:#0184bc;">MPI_INFO_CREATE</span><span>(config</span><span style="color:#a626a4;">%</span><span>manager_config, ierror)
+</span><span>  </span><span style="color:#a0a1a7;">! call MPI_INFO_SET(config%manager_config, &quot;manager_initial_number_random&quot;, &quot;yes&quot;)
+</span><span>  </span><span style="color:#a626a4;">call </span><span style="color:#0184bc;">MPI_COMM_SIZE</span><span>(MPI_COMM_WORLD, world_size, ierror)
+</span><span>  </span><span style="color:#a626a4;">call </span><span style="color:#0184bc;">MPI_INFO_SET</span><span>(config</span><span style="color:#a626a4;">%</span><span>manager_config, </span><span style="color:#50a14f;">&quot;manager_initial_number&quot;</span><span>, itoa(world_size </span><span style="color:#a626a4;">- </span><span style="color:#c18401;">1</span><span>), ierror)
+</span><span>
+</span><span>  </span><span style="color:#a626a4;">call </span><span style="color:#0184bc;">MPIDYNRES_SIM_START</span><span>(config, main_func)
+</span><span>
+</span><span>  </span><span style="color:#a626a4;">call </span><span style="color:#0184bc;">MPI_INFO_FREE</span><span>(config</span><span style="color:#a626a4;">%</span><span>manager_config, ierror)
+</span><span>  </span><span style="color:#a626a4;">call </span><span style="color:#0184bc;">MPI_FINALIZE</span><span>(ierror)
+</span><span style="color:#a626a4;">END PROGRAM </span><span style="color:#0184bc;">main
+</span></code></pre>
+<p>This assumes that the code that will be run by <strong>libmpidynres</strong> is contained in a module called <code>app</code> in a function called <code>app_main</code>.
+Note that:</p>
+<ul>
+<li>MPI needs to be initialized and finalized by the wrapper</li>
+<li>to access the <strong>libmpidynres</strong> application wrapper functions, the module <code>mpidynres_sim_f08</code> is imported. For <em>Fortran 90</em>, the module is called <code>mpidynres_sim</code></li>
+<li>the communicator that is being used for the simulation is configured by setting the <code>base_communicator</code> field of the config</li>
+</ul>
+<p>A fitting <strong>mpidynres</strong> application for the above wrapper might look like this:</p>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">MODULE </span><span style="color:#0184bc;">app
+</span><span style="color:#a626a4;">use mpi_f08
+</span><span>use, intrinsic </span><span style="color:#a626a4;">::</span><span> iso_c_binding
+</span><span>
+</span><span style="color:#a626a4;">contains
+</span><span>
+</span><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">app_main</span><span>() bind(c)
+</span><span>  </span><span style="color:#a626a4;">use mpidynres_f08
+</span><span>  </span><span style="color:#a626a4;">implicit none
+</span><span>  ...
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">app_main
+</span></code></pre>
+<p>Note that:</p>
+<ul>
+<li>to access the <strong>libmpidynres</strong> application functions, the module <code>mpidynres_f08</code> is imported. For <em>Fortran 90</em>, the module is called <code>mpidynres</code></li>
+<li>the entry subroutine must be annotated using <code>bind(c)</code></li>
+</ul>
+<p>A complete example can be found in the <code>libmipdynres/examples</code> folder (<a rel="noopener" target="_blank" href="https://github.com/boi4/libmpidynres/blob/master/examples/0a_fortran_example.f08">link f08</a>, <a rel="noopener" target="_blank" href="https://github.com/boi4/libmpidynres/blob/master/examples/0b_fortran_f08_example.f08">link f08</a>).</p>
+<p>These examples can be compiled by running <code>make fortran_examples</code>.</p>
+<h3 id="libpfasst-libmpidynres">LibPFASST + libmpidynres</h3>
+<div class="alert alert-danger position-static" role="alert">
+<p>The initial dynamic LibPFASST implementation was based on <em>libmpidynres</em> and the API documented here.
+That version of <em>LibPFASST</em> can be found on the branch <code>mpidynres</code> of the LibPFASST repository (<a rel="noopener" target="_blank" href="https://github.com/boi4/LibPFASST/tree/mpidynres">link</a>).
+Note that, compared to the final, Open MPI-based version, this version is not documented to the same amount here and also contains less features.
+The instructions here are only mentioned for the sake of completeness.</p>
+</div>
+<p>To compile LibPFASST with mpidynres, you can run the following commands (in the parent directory of the <strong>libmpidynres</strong> source code):</p>
+<pre data-lang="bash" style="background-color:#fafafa;color:#383a42;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#e45649;">git</span><span> clone</span><span style="color:#e45649;"> --branch</span><span> mpidynres https://github.com/boi4/LibPFASST.git
+</span><span>
+</span><span style="color:#0184bc;">cd</span><span> LibPFASST
+</span><span>
+</span><span style="color:#a0a1a7;"># make it work with newer gfortran versions
+</span><span style="color:#e45649;">sed -i </span><span style="color:#50a14f;">&#39;/FFLAGS = -fallow-argument-mismatch/s/^.*$/FFLAGS += -fallow-argument-mismatch/g&#39;</span><span> Makefile.local
+</span><span>
+</span><span style="color:#a0a1a7;"># compile
+</span><span style="color:#e45649;">make</span><span> DYNRES=TRUE MPIDYNRES_PATH=../libmpidynres
+</span></code></pre>
+<p>During the compilation of <em>LibPFASST</em>, the libmpidynres Fortran module files are included by passing them to the compilation commands. When using <code>LibPFASST</code>, the final executable must be dynamically linked against <code>libmpidynres.so</code>.</p>
+<p>An example application is included in the <code>Tutorials/EX6_dynamic_mpi</code> directory.
+To compile it use:</p>
+<pre data-lang="bash" style="background-color:#fafafa;color:#383a42;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#0184bc;">cd</span><span> Tutorials/EX6_dynamic_mpi
+</span><span>
+</span><span style="color:#a0a1a7;"># compile example
+</span><span style="color:#e45649;">make</span><span> MPIDYNRES_PATH=../../../libmpidynres
+</span></code></pre>
+<p>To run it on up to 7 processes (8 with the mpidynres resource manager) use:</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>LD_LIBRARY_PATH=../../../libmpidynres/build/lib mpirun -n 8 ./main.exe probin.nml
+</span></code></pre>
+<p>To get more debug output, the environment variable <code>MPIDYNRES_DEBUG</code> can be set before running the program.</p>
+<hr />
+<a href="#f90API" class="collapsed" data-bs-toggle="collapse" data-bs-target="#f90API" aria-expanded="false" aria-controls="f90API" style="text-decoration: none; color: black;">
+<h3><span class="togglearrow" >▲</span>libmpidynres Fortran 90 API (click to expand)</h3>
+</a>
+<div id="f90API" class="collapse">
+The following modules should be used by the user:
+<br />
+<br />
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span>use, intrinsic </span><span style="color:#a626a4;">::</span><span> iso_c_binding
+</span><span style="color:#a626a4;">use mpidynres
+</span><span style="color:#a626a4;">use mpidynres_sim
+</span></code></pre>
+<p>The <code>iso_c_binding</code> module is necessary for the <code>type(c_ptr)</code> type and for adding the <code>bind(c)</code> statement to the mpidynres entry function.</p>
+<p>A designated <em>MPI_Session</em> type does not exists. Also, the <code>integer</code> type is not used for the session. Instead, the session argument of the API is of type <code>type(c_ptr)</code>.</p>
+<p>The mpidynres config type is defined like this:</p>
+<pre data-lang="f90" style="background-color:#fafafa;color:#383a42;" class="language-f90 "><code class="language-f90" data-lang="f90"><span style="color:#a626a4;">use mpi
+</span><span>type, bind(C) </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_SIM_CONFIG
+</span><span>  integer </span><span style="color:#a626a4;">::</span><span> base_communicator
+</span><span>  integer </span><span style="color:#a626a4;">::</span><span> manager_config
+</span><span style="color:#a626a4;">end type </span><span style="color:#0184bc;">MPIDYNRES_SIM_CONFIG
+</span></code></pre>
+<p>Functions behave just like in the C version of <em>libmpidynres</em> and with the respective MPI Fortran 90 types (mostly <code>integer</code>). An additional, optional argument called <code>ierror</code> is added that contains the return value of the C function.</p>
+<h5 id="application-constants">Application Constants</h5>
+<p>The following constants are contained in the <code>mpidynres</code> module:</p>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a0a1a7;">! constants exported as symbols by libmpidynres.so
+</span><span>type(c_ptr), bind(C, </span><span style="color:#e45649;">name</span><span style="color:#a626a4;">=</span><span style="color:#50a14f;">&quot;MPI_SESSION_NULL&quot;</span><span>) </span><span style="color:#a626a4;">::</span><span> MPI_SESSION_NULL
+</span><span>integer(</span><span style="color:#e45649;">kind</span><span style="color:#a626a4;">=</span><span>C_INT), bind(C, </span><span style="color:#e45649;">name</span><span style="color:#a626a4;">=</span><span style="color:#50a14f;">&quot;MPIDYNRES_INVALID_SESSION_ID&quot;</span><span>) </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_INVALID_SESSION_ID
+</span><span>
+</span><span style="color:#a0a1a7;">! manually defined constants
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPI_MAX_PSET_NAME_LEN      </span><span style="color:#a626a4;">=</span><span> MPI_MAX_INFO_KEY </span><span style="color:#a626a4;">+ </span><span style="color:#c18401;">1
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_NO_ORIGIN_RC_TAG </span><span style="color:#a626a4;">= -</span><span style="color:#c18401;">1
+</span><span>
+</span><span style="color:#a0a1a7;">! enum MPIDYNRES_pset_op
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_PSET_UNION      </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">0
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_PSET_INTERSECT  </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">1
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_PSET_DIFFERENCE </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">2
+</span><span>
+</span><span style="color:#a0a1a7;">! enum MPIDYNRES_RC_type
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_RC_NONE </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">0
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_RC_ADD  </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">1
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_RC_SUB  </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">2
+</span></code></pre>
+<h5 id="application-functions">Application Functions</h5>
+<p>The following subroutines are contained in the <code>mpidynres</code> module:</p>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_INIT</span><span>(</span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">errhandler</span><span>, </span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  integer                       , intent(in)  </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  integer                       , intent(in)  </span><span style="color:#a626a4;">::</span><span> errhandler
+</span><span>  type(c_ptr)                   , intent(out) </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer             , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_INIT
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_FINALIZE</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                   , intent(inout) </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer             , optional, intent(out)   </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_FINALIZE
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_INFO</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">info_used</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)           , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer               , intent(out) </span><span style="color:#a626a4;">::</span><span> info_used
+</span><span>  integer     , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_INFO
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_PSETS</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">psets</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)           , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer               , intent(in)  </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  integer               , intent(out) </span><span style="color:#a626a4;">::</span><span> psets
+</span><span>  integer     , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_PSETS
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_PSET_INFO</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">pset_name</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  </span><span style="color:#a626a4;">character(len=*)           </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset_name
+</span><span>  integer                    , intent(out) </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  integer          , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_PSET_INFO
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_GROUP_FROM_SESSION_PSET</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">pset_name</span><span>, </span><span style="color:#e45649;">newgroup</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  </span><span style="color:#a626a4;">character(len=*)           </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset_name
+</span><span>  integer                    , intent(out) </span><span style="color:#a626a4;">::</span><span> newgroup
+</span><span>  integer          , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_GROUP_FROM_SESSION_PSET
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_COMM_CREATE_FROM_GROUP</span><span>(</span><span style="color:#e45649;">group</span><span>, </span><span style="color:#e45649;">stringtag</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">errhandler</span><span>, </span><span style="color:#e45649;">newcomm</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  integer                    , intent(in)  </span><span style="color:#a626a4;">::</span><span> group
+</span><span>  </span><span style="color:#a626a4;">character(len=*)           </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">stringtag
+</span><span>  integer                    , intent(in)  </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  integer                    , intent(in)  </span><span style="color:#a626a4;">::</span><span> errhandler
+</span><span>  integer                    , intent(out) </span><span style="color:#a626a4;">::</span><span> newcomm
+</span><span>  integer          , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_COMM_CREATE_FROM_GROUP
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_PSET_CREATE_OP</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">hints</span><span>, </span><span style="color:#e45649;">pset1</span><span>, </span><span style="color:#e45649;">pset2</span><span>, </span><span style="color:#e45649;">op</span><span>, </span><span style="color:#e45649;">pset_result</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer                     , intent(in)  </span><span style="color:#a626a4;">::</span><span> hints
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset1
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset2
+</span><span>  integer(</span><span style="color:#e45649;">kind</span><span style="color:#a626a4;">=</span><span>c_int)         , intent(in)  </span><span style="color:#a626a4;">::</span><span> op
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">out</span><span>) </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset_result
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_PSET_CREATE_OP
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_PSET_FREE</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">pset_name</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset_name
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_PSET_FREE
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_ADD_SCHEDULING_HINTS</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">hints</span><span>, </span><span style="color:#e45649;">answer</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer                     , intent(in)  </span><span style="color:#a626a4;">::</span><span> hints
+</span><span>  integer                     , intent(out) </span><span style="color:#a626a4;">::</span><span> answer
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_ADD_SCHEDULING_HINTS
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_RC_GET</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">rc_type</span><span>, </span><span style="color:#e45649;">delta_pset</span><span>, </span><span style="color:#e45649;">tag</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer                     , intent(out) </span><span style="color:#a626a4;">::</span><span> rc_type
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">out</span><span>) </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">delta_pset
+</span><span>  integer                     , intent(out) </span><span style="color:#a626a4;">::</span><span> tag
+</span><span>  integer                     , intent(out) </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_RC_GET
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_RC_ACCEPT</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">tag</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer                     , intent(in)  </span><span style="color:#a626a4;">::</span><span> tag
+</span><span>  integer                     , intent(in)  </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_RC_ACCEPT
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_EXIT</span><span>()
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_EXIT
+</span></code></pre>
+<h5 id="application-wrapper-functions">Application Wrapper Functions</h5>
+<p>The following subroutines are contained in the <code>mpidynres_sim</code> module:</p>
+<pre data-lang="f90" style="background-color:#fafafa;color:#383a42;" class="language-f90 "><code class="language-f90" data-lang="f90"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_SIM_GET_DEFAULT_CONFIG</span><span>(</span><span style="color:#e45649;">o_config</span><span>)
+</span><span>  type(MPIDYNRES_SIM_CONFIG), intent(out) </span><span style="color:#a626a4;">::</span><span> o_config
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_SIM_GET_DEFAULT_CONFIG
+</span></code></pre>
+<pre data-lang="f90" style="background-color:#fafafa;color:#383a42;" class="language-f90 "><code class="language-f90" data-lang="f90"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_SIM_START</span><span>(</span><span style="color:#e45649;">i_config</span><span>, </span><span style="color:#e45649;">i_sim_main</span><span>)
+</span><span>  type(MPIDYNRES_SIM_CONFIG), intent(in) </span><span style="color:#a626a4;">::</span><span> i_config
+</span><span>  procedure(mpidynres_main_func)         </span><span style="color:#a626a4;">::</span><span> i_sim_main
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_SIM_START
+</span></code></pre>
+</div>
+<hr />
+<a href="#f08API" class="collapsed" data-bs-toggle="collapse" data-bs-target="#f08API" aria-expanded="false" aria-controls="f08API" style="text-decoration: none; color: black;">
+<h3><span class="togglearrow" >▲</span>libmpidynres Fortran 2008 API (click to expand)</h3>
+</a>
+<div id="f08API" class="collapse">
+<p>The following modules should be used by the user:</p>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span>use, intrinsic </span><span style="color:#a626a4;">::</span><span> iso_c_binding
+</span><span style="color:#a626a4;">use mpidynres_f08
+</span><span style="color:#a626a4;">use mpidynres_sim_f08
+</span></code></pre>
+<p>As in the Fortran 90 case, the <code>iso_c_binding</code> module is necessary for the <code>type(c_ptr)</code> type and for adding the <code>bind(c)</code> statement to the mpidynres entry function.</p>
+<p>As in Fortran 90, the session argument of the API is of type <code>type(c_ptr)</code>.</p>
+<p>The mpidynres config type is defined like this:</p>
+<pre data-lang="f90" style="background-color:#fafafa;color:#383a42;" class="language-f90 "><code class="language-f90" data-lang="f90"><span style="color:#a626a4;">use mpi_f08
+</span><span>type, bind(C) </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_SIM_CONFIG
+</span><span>  type(MPI_Comm) </span><span style="color:#a626a4;">::</span><span> base_communicator
+</span><span>  type(MPI_Info) </span><span style="color:#a626a4;">::</span><span> manager_config
+</span><span style="color:#a626a4;">end type </span><span style="color:#0184bc;">MPIDYNRES_SIM_CONFIG
+</span></code></pre>
+<p>Functions behave just like in the C version of <em>libmpidynres</em> and with the respective MPI Fortran 2008 types. An additional, optional argument called <code>ierror</code> is added that contains the return value of the C function.</p>
+<h5 id="application-constants-1">Application Constants</h5>
+<p>The following constants are contained in the <code>mpidynres_f08</code> module:</p>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a0a1a7;">! constants exported as symbols by libmpidynres.so
+</span><span>type(c_ptr), bind(C, </span><span style="color:#e45649;">name</span><span style="color:#a626a4;">=</span><span style="color:#50a14f;">&quot;MPI_SESSION_NULL&quot;</span><span>) </span><span style="color:#a626a4;">::</span><span> MPI_SESSION_NULL
+</span><span>integer(</span><span style="color:#e45649;">kind</span><span style="color:#a626a4;">=</span><span>C_INT), bind(C, </span><span style="color:#e45649;">name</span><span style="color:#a626a4;">=</span><span style="color:#50a14f;">&quot;MPIDYNRES_INVALID_SESSION_ID&quot;</span><span>) </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_INVALID_SESSION_ID
+</span><span>
+</span><span style="color:#a0a1a7;">! manually defined constants
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPI_MAX_PSET_NAME_LEN      </span><span style="color:#a626a4;">=</span><span> MPI_MAX_INFO_KEY </span><span style="color:#a626a4;">+ </span><span style="color:#c18401;">1
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_NO_ORIGIN_RC_TAG </span><span style="color:#a626a4;">= -</span><span style="color:#c18401;">1
+</span><span>
+</span><span style="color:#a0a1a7;">! enum MPIDYNRES_pset_op
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_PSET_UNION      </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">0
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_PSET_INTERSECT  </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">1
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_PSET_DIFFERENCE </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">2
+</span><span>
+</span><span style="color:#a0a1a7;">! enum MPIDYNRES_RC_type
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_RC_NONE </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">0
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_RC_ADD  </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">1
+</span><span>integer </span><span style="color:#a626a4;">::</span><span> MPIDYNRES_RC_SUB  </span><span style="color:#a626a4;">= </span><span style="color:#c18401;">2
+</span></code></pre>
+<p>Note that they are the same constants as in the Fortran 90 module.</p>
+<h5 id="application-functions-1">Application Functions</h5>
+<p>The following constants are contained in the <code>mpidynres_f08</code> module:</p>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_INIT</span><span>(</span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">errhandler</span><span>, </span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(MPI_Info)                , intent(in)  </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  type(MPI_Errhandler)          , intent(in)  </span><span style="color:#a626a4;">::</span><span> errhandler
+</span><span>  type(c_ptr)                   , intent(out) </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer             , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_INIT
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_FINALIZE</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                   , intent(inout) </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer             , optional, intent(out)   </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_FINALIZE
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_INFO</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">info_used</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                   , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  type(MPI_INFO)                , intent(out) </span><span style="color:#a626a4;">::</span><span> info_used
+</span><span>  integer             , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_INFO
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_PSETS</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">psets</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                   , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  type(MPI_INFO)                , intent(in)  </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  type(MPI_INFO)                , intent(out) </span><span style="color:#a626a4;">::</span><span> psets
+</span><span>  integer             , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_PSETS
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_PSET_INFO</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">pset_name</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset_name
+</span><span>  type(MPI_INFO)              , intent(out) </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_SESSION_GET_PSET_INFO
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_GROUP_FROM_SESSION_PSET</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">pset_name</span><span>, </span><span style="color:#e45649;">newgroup</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset_name
+</span><span>  type(MPI_Group)             , intent(out) </span><span style="color:#a626a4;">::</span><span> newgroup
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_GROUP_FROM_SESSION_PSET
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPI_COMM_CREATE_FROM_GROUP</span><span>(</span><span style="color:#e45649;">group</span><span>, </span><span style="color:#e45649;">stringtag</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">errhandler</span><span>, </span><span style="color:#e45649;">newcomm</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(MPI_Group)             , intent(in)  </span><span style="color:#a626a4;">::</span><span> group
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">stringtag
+</span><span>  type(MPI_Info)              , intent(in)  </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  type(MPI_Errhandler)        , intent(in)  </span><span style="color:#a626a4;">::</span><span> errhandler
+</span><span>  type(MPI_Comm)              , intent(out) </span><span style="color:#a626a4;">::</span><span> newcomm
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPI_COMM_CREATE_FROM_GROUP
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_PSET_CREATE_OP</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">hints</span><span>, </span><span style="color:#e45649;">pset1</span><span>, </span><span style="color:#e45649;">pset2</span><span>, </span><span style="color:#e45649;">op</span><span>, </span><span style="color:#e45649;">pset_result</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  type(MPI_Info)              , intent(in)  </span><span style="color:#a626a4;">::</span><span> hints
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset1
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset2
+</span><span>  integer(</span><span style="color:#e45649;">kind</span><span style="color:#a626a4;">=</span><span>c_int)         , intent(in)  </span><span style="color:#a626a4;">::</span><span> op
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">out</span><span>) </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset_result
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_PSET_CREATE_OP
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_PSET_FREE</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">pset_name</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">in</span><span>)  </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">pset_name
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_PSET_FREE
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_ADD_SCHEDULING_HINTS</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">hints</span><span>, </span><span style="color:#e45649;">answer</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  type(MPI_Info)              , intent(in)  </span><span style="color:#a626a4;">::</span><span> hints
+</span><span>  type(MPI_Info)              , intent(out) </span><span style="color:#a626a4;">::</span><span> answer
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_ADD_SCHEDULING_HINTS
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_RC_GET</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">rc_type</span><span>, </span><span style="color:#e45649;">delta_pset</span><span>, </span><span style="color:#e45649;">tag</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer                     , intent(out) </span><span style="color:#a626a4;">::</span><span> rc_type
+</span><span>  </span><span style="color:#a626a4;">character(len=*)            </span><span>, </span><span style="color:#a626a4;">intent</span><span>(</span><span style="color:#c18401;">out</span><span>) </span><span style="color:#a626a4;">:: </span><span style="color:#e45649;">delta_pset
+</span><span>  integer                     , intent(out) </span><span style="color:#a626a4;">::</span><span> tag
+</span><span>  type(MPI_Info)              , intent(out) </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_RC_GET
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_RC_ACCEPT</span><span>(</span><span style="color:#e45649;">session</span><span>, </span><span style="color:#e45649;">tag</span><span>, </span><span style="color:#e45649;">info</span><span>, </span><span style="color:#e45649;">ierror</span><span>)
+</span><span>  type(c_ptr)                 , intent(in)  </span><span style="color:#a626a4;">::</span><span> session
+</span><span>  integer                     , intent(in) </span><span style="color:#a626a4;">::</span><span> tag
+</span><span>  type(MPI_Info)              , intent(in) </span><span style="color:#a626a4;">::</span><span> info
+</span><span>  integer           , optional, intent(out) </span><span style="color:#a626a4;">::</span><span> ierror
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_RC_ACCEPT
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_EXIT</span><span>()
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_EXIT
+</span></code></pre>
+<h5 id="application-wrapper-functions-1">Application Wrapper Functions</h5>
+<p>The following subroutines are contained in the <code>mpidynres_sim_08</code> module:</p>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_SIM_GET_DEFAULT_CONFIG</span><span>(</span><span style="color:#e45649;">o_config</span><span>)
+</span><span>  type(MPIDYNRES_SIM_CONFIG), intent(out) </span><span style="color:#a626a4;">::</span><span> o_config
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_SIM_GET_DEFAULT_CONFIG
+</span></code></pre>
+<pre data-lang="f08" style="background-color:#fafafa;color:#383a42;" class="language-f08 "><code class="language-f08" data-lang="f08"><span style="color:#a626a4;">subroutine </span><span style="color:#0184bc;">MPIDYNRES_SIM_START</span><span>(</span><span style="color:#e45649;">i_config</span><span>, </span><span style="color:#e45649;">i_sim_main</span><span>)
+</span><span>  type(MPIDYNRES_SIM_CONFIG), intent(in) </span><span style="color:#a626a4;">::</span><span> i_config
+</span><span>  procedure(mpidynres_main_func) </span><span style="color:#a626a4;">::</span><span> i_sim_main
+</span><span style="color:#a626a4;">end subroutine </span><span style="color:#0184bc;">MPIDYNRES_SIM_START
+</span></code></pre>
+</div>
+
+      
+    </div>
+
+
+  </div> <!-- End of Container -->
+
+  <!-- Footer -->
+  <div class="container mb-3">
+    <div class="text-muted">TUM Interdisciplinary Project, Jan Fecht, 2023. pictures & videos: <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">CC BY 3.0</a>, code snippets: <a rel="license" href="https://opensource.org/license/mit/">MIT</a></div>
+  </div>
+
+  <script src="https://fecht.cc/libpfasst-doc/bootstrap.bundle-5.3.0.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"></script>
+  <script src="https://fecht.cc/libpfasst-doc/elasticlunr.min.js"></script>
+  <script src="https://fecht.cc/libpfasst-doc/search.js"></script>
+  <script>
+// initialize search
+if (document.readyState === "complete" ||
+    (document.readyState !== "loading" && !document.documentElement.doScroll)
+) {
+  initSearch("https://fecht.cc/libpfasst-doc/");
+} else {
+  document.addEventListener("DOMContentLoaded", () => {initSearch("https://fecht.cc/libpfasst-doc/")});
+}
+  </script>
+</body>
+
+</html>

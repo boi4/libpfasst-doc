@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Tools</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LibPFASST dynamic resources documentation" />
+  <meta name="keywords" content="HPC,Parallel-in-Time" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- bootstrap css -->
+  <link href="https://fecht.cc/libpfasst-doc/bootstrap-5.3.0.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+<style>
+/* flip the arrow when the content is collapsed */
+.collapsed .togglearrow {
+  transform: rotate(90deg);
+  display: inline-block;
+}
+.togglearrow {
+  transform: rotate(180deg);
+  color: black;
+  display: inline-block;
+}
+
+td {
+  padding: 0 15px;
+}
+th {
+  padding: 0 15px;
+}
+
+/* search results */
+.search-container {
+  display: inline-block;
+  position: relative;
+  width: 300px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.search-results {
+  display: none;
+  position: absolute;
+  background: white;
+  color: black;
+  padding: 1rem;
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.5);
+  max-height: 500px;
+  overflow: auto;
+  width: 150%;
+  right: 0;
+}
+
+/* Search results on mobile have 100% width*/
+@media (max-width: 767px) {
+  .search-results {
+    width: 100%;
+  }/* SM breakpoint */
+
+  /* CUSTOM WIDTHS */
+  .w-md-25 { width: 25%!important; }
+  .w-md-50 { width: 50%!important; }
+  .w-md-75 { width: 75%!important; }
+  .w-md-100 { width: 100%!important; }
+}
+
+.search-results__items {
+  list-style: none;
+}
+
+
+.search-results__items > li {
+  margin-top: 1rem;
+  border-bottom: 1px solid #ccc;
+  font-size: 0.9rem;
+
+}
+.search-results__items li:first-of-type {
+  margin-top: 0;
+}
+
+.search-results__item {
+  margin-bottom: 1rem;
+}
+
+.search-results__item > a {
+  font-size: 1.2rem;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+
+.text-muted > a {
+  color: var(--bs-secondary-color) !important;
+}
+
+</style>
+</head>
+
+<body>
+
+  <div class="container border pt-3 my-3">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light px-2" style="background-color: #e3f2fd;">
+
+      <a class="navbar-brand" href="https://fecht.cc/libpfasst-doc/">Dynamic LibPFASST</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/open-mpi/">Open MPI</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/libpfasst/">LibPFASST</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/showcase/">Showcase</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link active" href="https://fecht.cc/libpfasst-doc/tools/">Tools</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/libmpidynres/">libmpidynres</a>
+          </li>
+        </ul>
+
+
+        <div class="search-container navbar-form navbar-right mx-2">
+            <input id="search" type="search" placeholder="🔎 Search this site" aria-label="Search">
+
+            <div class="search-results">
+                <div class="search-results__items"></div>
+            </div>
+        </div>
+      </div> <!-- End of Collapse -->
+    </nav>
+
+    <!-- content -->
+    <div class="pt-3">
+      
+      <h1 id="tools">Tools</h1>
+<p>Debugging parallel programs is hard. Especially MPI programs.</p>
+<p>Debugging dynamic MPI programs is even harder. That is why I created multiple tools to facilitate the development and debugging of dynamic applications.</p>
+<h2 id="tmpi-py">tmpi.py</h2>
+<p><code>tmpi.py</code> allows you to interact with each process of an MPI run in a different tmux (a terminal multiplexer) pane.
+This is very useful in terminal-only environments (ssh/docker/...) where typical tricks like starting multiple instances of a terminal emulator do not work.</p>
+<p>The source code is available on Github: <a rel="noopener" target="_blank" href="https://github.com/boi4/tmpi-py">https://github.com/boi4/tmpi-py</a></p>
+<p>It is is a python rewrite of <a rel="noopener" target="_blank" href="https://github.com/Azrael3000/tmpi">tmpi</a> with the following benefits:</p>
+<ul>
+<li>Support for dynamic resizing of MPI jobs</li>
+<li>Faster startup</li>
+<li>Support mpirun with multiple hosts (with <code>MPIRUNARGS=&quot;--host ...&quot; ./tmpi.py ...</code>)</li>
+<li>mpi rank and host are shown in the upper frame of each pane</li>
+<li>No need to quote + escape mpi command</li>
+</ul>
+<p>It has the following disadvantages:</p>
+<ul>
+<li>you can run only one instance of <code>tmpi.py</code> on a single host</li>
+<li>if you have mpi processes on other hosts, you need to be able to ssh into them</li>
+<li><code>tmpi.py</code> opens a port for remote mpi processes to register themselves. This might be a security issue.</li>
+</ul>
+<h3 id="dynamic-applications">Dynamic Applications</h3>
+<p>When running applications using <a href="https://fecht.cc/libpfasst-doc/open-mpi/">dynamic Open MPI</a>, <code>tmpi.py</code> will respond to resource changes in the following fashion:</p>
+<ul>
+<li><strong>Resource addition</strong>: For each new process, a new tmux pane is created and the stdin/stdout of the process is connected to the pane.</li>
+<li><strong>Resource removal</strong>: If <code>TMPI_REMAIN=true</code>, the panes of stopped processes remain on the screen (useful for post-mortem debugging). Otherwise, the pane will be removed together with the process.</li>
+</ul>
+<h3 id="dependencies-installed-on-each-mpi-host">Dependencies (installed on each MPI host)</h3>
+<ul>
+<li><a rel="noopener" target="_blank" href="https://github.com/tmux/tmux/wiki">tmux</a></li>
+<li><a rel="noopener" target="_blank" href="https://github.com/nelhage/reptyr">Reptyr</a></li>
+<li>Python 3.7 or later</li>
+</ul>
+<h3 id="further-requirements">Further requirements</h3>
+<ul>
+<li>If you run mpi processes on remote hosts, you need to be able to ssh into them with the user that started <code>tmpi.py</code> without any password prompt</li>
+</ul>
+<h3 id="installation">Installation</h3>
+<p>Just copy the <code>tmpi.py</code> script somewhere in your <code>PATH</code>.
+If you run MPI on multiple hosts, the <code>tmpi.py</code> script must be available at the same location on each host.</p>
+<h3 id="full-usage">Full usage</h3>
+<p><code>./tmpi.py [number of initial processes] COMMAND ARG1 ...</code></p>
+<p>You need to pass at least two arguments.
+The first argument is the number of processes to use, every argument after that is the commandline to run.</p>
+<p>If the environment variable <code>TMPI_REMAIN=true</code>, the new window is set to remain on exit and has to be closed manually. (&quot;C-b + &amp;&quot; by default)</p>
+<p>You can pass additional 'mpirun' argument via the <code>MPIRUNARGS</code> environment variable</p>
+<p>You can use the environment variable <code>TMPI_TMUX_OPTIONS</code> to pass options to the <code>tmux</code> invocation,
+such as <code>TMPI_TMUX_OPTIONS='-f ~/.tmux.conf.tmpi'</code> to use a special tmux configuration for tmpi.</p>
+<p>Little usage hint: By default the panes in the window are synchronized. If you wish to work only with one process without distraction, maximize the corresponding pane pane (&quot;C-b + z&quot; by default). Return to the global view using the same shortcut.</p>
+<h3 id="examples">Examples</h3>
+<p>Parallel debugging with GDB:</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>tmpi.py 4 gdb executable
+</span></code></pre>
+<p>It is advisable to run gdb with a script (e.g. <code>script.gdb</code>) so you can use</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>tmpi.py 4 gdb -x script.gdb executable
+</span></code></pre>
+<p>If you have a lot of processors you want to have <code>set pagination off</code> and add the <code>-q</code> argument to gdb:</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>tmpi.py 4 gdb -q -x script.gdb executable
+</span></code></pre>
+<p>This avoids pagination and the output of the copyright of gdb, which can be a nuissance when you have very small tmux panes.</p>
+<p>A more complicated <code>tmpi.py</code> command might look like this:</p>
+<pre data-lang="bash" style="background-color:#fafafa;color:#383a42;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#e45649;">MPIRUNARGS</span><span style="color:#a626a4;">=</span><span style="color:#50a14f;">&#39;--mca btl_tcp_if_include eth0 --host n01:4,n02:4,n03:4,n04:4,n05:4,n06:4,n07:4,n08:4&#39; </span><span>\
+</span><span>    </span><span style="color:#e45649;">TMPI_REMAIN</span><span style="color:#a626a4;">=</span><span style="color:#50a14f;">&quot;true&quot; </span><span>\
+</span><span>        </span><span style="color:#e45649;">tmpi.py</span><span> 32 \
+</span><span>        gdb</span><span style="color:#e45649;"> -q </span><span>\
+</span><span style="color:#e45649;">                -ex </span><span style="color:#50a14f;">&quot;set pagination off&quot; </span><span>\
+</span><span style="color:#e45649;">                -ex </span><span style="color:#50a14f;">&quot;set breakpoint pending on&quot; </span><span>\
+</span><span style="color:#e45649;">                -ex </span><span style="color:#50a14f;">&quot;b _gfortran_runtime_error_at&quot; </span><span>\
+</span><span style="color:#e45649;">                -ex </span><span style="color:#50a14f;">&quot;b ompi_errhandler_invoke&quot; </span><span>\
+</span><span style="color:#e45649;">                -ex </span><span style="color:#50a14f;">&quot;b myfile.f90:1337&quot; </span><span>\
+</span><span style="color:#e45649;">                -ex</span><span> r \
+</span><span style="color:#e45649;">                -ex</span><span> q \
+</span><span style="color:#e45649;">                --args </span><span>\
+</span><span>                ./executable arg1 arg2 ...
+</span></code></pre>
+<p>Here, <code>tmpi.py</code> will run 32 MPI processes on 8 hosts in parallel with GDB attached to each of them. Also, GDB will break on Fortran and Open MPI errors and on a custom user breakpoint.
+Note that the <code>-ex</code> commands could also be put into a script file.</p>
+<h3 id="keybindings">Keybindings</h3>
+<p>In general, the keybindings from <a rel="noopener" target="_blank" href="https://github.com/tmux/tmux/wiki">tmux</a> apply. The most useful ones are the following:</p>
+<ul>
+<li><code>Ctrl-b + c</code> - Create a new window</li>
+<li><code>Ctrl-b + n</code> - Go to next window</li>
+<li><code>Ctrl-b + p</code> - Go to previous window</li>
+<li><code>Ctrl-b + &amp;</code> - Kill current window (a window is like a &quot;tab&quot; at the bottom)</li>
+<li><code>Ctrl-b + z</code> - Maximize/Minimize currently selected pane. Useful for debugging a single process.</li>
+<li><code>Ctrl-b + &lt;arrow key&gt;</code> - Select pane left/right/above/below currently selected pane.</li>
+</ul>
+<h3 id="screenshots">Screenshots</h3>
+<br/>
+<a href="./tmpi_debug_example.png" target="_blank">
+<img class="img-fluid rounded mx-auto" src="./tmpi_debug_example.png">
+</a>
+<figcaption class="figure-caption" style="text-align: center; margin-bottom: 2em; margin-top: 1em">
+    tmpi.py showing 16 gdb processes debugging an MPI application.
+</figcaption>
+<div class="embed-responsive embed-responsive-16by9">
+    <video class="embed-responsive" controls width="100%">
+        <source src="./tmpi_add_sub_example.mp4" type="video/mp4">
+        Video Placeholder
+    </video>
+</div>
+<figcaption class="figure-caption" style="text-align: center; margin-bottom: 2em; margin-top: 1em">
+    tmpi.py running an application that grows and shrinks dynamically on up to 4 hosts.
+</figcaption>
+<hr />
+<br/>
+<h2 id="dynvis">DynVis</h2>
+<br/>
+<p>It can be useful to visualize a dynamic MPI run, to be able to retrospectively figure out which Process Set events happened.
+It is usually quite difficult to figure this out own your own just by looking at print statements in the terminal (although <code>tmpi.py</code> already drastically improves this situation).</p>
+<p>Therefore, a log file format was designed and accompanying log file visualizer called <code>DynVis</code> was implemented.
+The source code of <code>DynVis</code> is available on <a rel="noopener" target="_blank" href="https://github.com/boi4/dynprocs_visualize">GitHub</a>.</p>
+<h3 id="logging-format-v1">Logging format (v1)</h3>
+<div class="alert alert-warning position-static" role="alert">
+  Warning: This log file format is a specification only. As of May 2023, the dynamic Open MPI fork does no actual logging.
+</div>
+<p>A v1 log file of a dynamic MPI run is a CSV file containing lines in the following format:</p>
+<p><code>unixtimestampmilis (integer), #job id (integer), action (string), action data (string, single line JSON, escaped with double quotes)</code></p>
+<p>Where <code>unixtimestampmilis</code> is the number of miliseconds since <a rel="noopener" target="_blank" href="https://en.wikipedia.org/wiki/Epoch_(computing)">epoch</a>,
+<code>job_id</code> is a unique identifier for the MPI job that was started and
+<code>action</code> is one of the unique actions below and the final json column provides some additional information about the action.</p>
+<p>Additionally, we allow for blank lines, and lines starting with a pound sign (<code>#</code>), which are both ignored while parsing.</p>
+<p>Available actions:</p>
+<div style="overflow-x:auto;">
+<table><thead><tr><th><strong>Action</strong></th><th><strong>Description</strong></th><th><strong>Example JSON</strong></th></tr></thead><tbody>
+<tr><td>job_start</td><td>A new job is started.</td><td><code>&quot;{&quot;&quot;job_id&quot;&quot;        : 0}&quot;</code></td></tr>
+<tr><td>job_end</td><td>A job has finished.</td><td><code>&quot;{&quot;&quot;job_id&quot;&quot;        : 0}&quot;</code></td></tr>
+<tr><td>new_pset</td><td>A new process set is announced. Needs to be done before any other interaction with that pset.</td><td><code>&quot;{&quot;&quot;proc_ids&quot;&quot;      : [0,1,2,3,4,5,6,7], &quot;&quot;id&quot;&quot;: &quot;&quot;mpi://world_0&quot;&quot;}&quot;</code></td></tr>
+<tr><td>set_start</td><td>A new process set is started (initial start or an add/grow).</td><td><code>&quot;{&quot;&quot;set_id&quot;&quot;        : &quot;&quot;mpi://world_0&quot;&quot;}&quot;</code></td></tr>
+<tr><td>process_start</td><td>A new process has started.</td><td><code>&quot;{&quot;&quot;proc_id&quot;&quot;       : 0}&quot;</code></td></tr>
+<tr><td>process_shutdown</td><td>A process has shutdown.</td><td><code>&quot;{&quot;&quot;proc_id&quot;&quot;       : 0}&quot;</code></td></tr>
+<tr><td>psetop</td><td>A process set operation has been applied by the runtime.</td><td><code>&quot;{&quot;&quot;initialized_by&quot;&quot;: 0, &quot;&quot;set_id&quot;&quot;: &quot;&quot;mpi://world_0&quot;&quot;, &quot;&quot;op&quot;&quot;: &quot;&quot;grow&quot;&quot;, &quot;&quot;input_sets&quot;&quot;: [], &quot;&quot;output_sets&quot;&quot;: [&quot;&quot;mpi://grow_0&quot;&quot;]}&quot;</code></td></tr>
+<tr><td>finalize_psetop</td><td>The application has successfully called finalize_psetop.</td><td><code>&quot;{&quot;&quot;initialized_by&quot;&quot;: 0, &quot;&quot;set_id&quot;&quot;: &quot;&quot;mpi://world_0&quot;&quot;}&quot;</code></td></tr>
+<tr><td>application_message</td><td>Some message from the application.</td><td><code>&quot;{&quot;&quot;message&quot;&quot;       : &quot;&quot;LibPFASST started&quot;&quot;}&quot;</code></td></tr>
+<tr><td>application_custom</td><td>Some custom data from the application.</td><td><em>arbitrary, but valid JSON</em></td></tr>
+</tbody></table>
+</div>
+<br/>
+<p><strong>Rationale:</strong> This format can be easily parsed by most programs like Excel, Python Pandas, etc. as it is a CSV format.
+CSV also allows simple merging (by concatenation) of log files and also allows the logger to log action by action compared to a more complex format like pure JSON.
+Allowing blank lines allows to add some visual separation of phases of the application and comments allow to manually add more context to specific events.</p>
+<p>Furthermore, here are some basic rules for the contents of a log files:</p>
+<ul>
+<li>log entries do not need to be sorted by time (you can just cat together log files from different sources without any sorting). However, if two events have the exact same timestamp given, their order in the log file matters.</li>
+<li>the file can include empty lines and lines beginning with a pound (#) sign, which are both skipped</li>
+<li>each process set has a unique name (no double “mpi://WORLDs”) and a determined number of procs. The name should be globally unique, but similar to the names that the applications see.</li>
+<li>each processor is identified by an integer in {0-(N-1)}</li>
+<li>each process must be part of at least one process set the moment it is used</li>
+<li>before a process set is used, <code>new_pset</code> must be called beforehand (timewise)</li>
+<li><code>set_start</code> comes before (timewise) the start of the processes in the set</li>
+</ul>
+<p>The following code snippet can be used to read the log file (<code>log_file_path</code>) in Python Pandas:</p>
+<pre data-lang="python" style="background-color:#fafafa;color:#383a42;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#a626a4;">import </span><span>pandas </span><span style="color:#a626a4;">as </span><span>pd
+</span><span style="color:#a626a4;">import </span><span>json
+</span><span>
+</span><span style="color:#a0a1a7;"># define columns
+</span><span>columns </span><span style="color:#a626a4;">= </span><span>[</span><span style="color:#50a14f;">&#39;unixtimestamp&#39;</span><span>, </span><span style="color:#50a14f;">&#39;job_id&#39;</span><span>, </span><span style="color:#50a14f;">&#39;event&#39;</span><span>, </span><span style="color:#50a14f;">&#39;event_data&#39;</span><span>]
+</span><span>
+</span><span style="color:#a0a1a7;"># read csv file, ignore comments
+</span><span>df </span><span style="color:#a626a4;">= </span><span>pd.</span><span style="color:#e45649;">read_csv</span><span>(log_file_path, </span><span style="color:#e45649;">names</span><span style="color:#a626a4;">=</span><span>columns, </span><span style="color:#e45649;">comment</span><span style="color:#a626a4;">=</span><span style="color:#50a14f;">&#39;#&#39;</span><span>)
+</span><span>
+</span><span style="color:#a0a1a7;"># remove empty and invalid lines
+</span><span>df.</span><span style="color:#e45649;">dropna</span><span>(</span><span style="color:#e45649;">how</span><span style="color:#a626a4;">=</span><span style="color:#50a14f;">&quot;all&quot;</span><span>, </span><span style="color:#e45649;">inplace</span><span style="color:#a626a4;">=</span><span style="color:#c18401;">True</span><span>)
+</span><span>
+</span><span style="color:#a0a1a7;"># parse json
+</span><span>df[</span><span style="color:#50a14f;">&#39;event_data&#39;</span><span>] </span><span style="color:#a626a4;">= </span><span style="color:#e45649;">self</span><span>.df[</span><span style="color:#50a14f;">&#39;event_data&#39;</span><span>].</span><span style="color:#e45649;">apply</span><span>(json.loads)
+</span></code></pre>
+<p>An example log file can be found <a rel="noopener" target="_blank" href="https://github.com/boi4/dynprocs_visualize/blob/main/examples/libpfasst_run_parallel.csv">here</a>.
+A useful class for parsing these logfiles can be found <a rel="noopener" target="_blank" href="https://github.com/boi4/dynprocs_visualize/blob/main/timeline.py">here</a>.</p>
+<h3 id="requirements">Requirements</h3>
+<p>The visualization is based on <a rel="noopener" target="_blank" href="https://docs.manim.community/en/stable/installation.html">Manim</a>, a visualization library for mathematical concepts.</p>
+<p>Make sure to follow the <a rel="noopener" target="_blank" href="https://docs.manim.community/en/stable/installation.html">installation instrucions</a> to install Manim on your operating system.</p>
+<h3 id="usage">Usage</h3>
+<p>Clone the DynVis repo:</p>
+<pre data-lang="bash" style="background-color:#fafafa;color:#383a42;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#e45649;">git</span><span> clone https://github.com/boi4/dynprocs_visualize.git </span><span style="color:#a626a4;">&amp;&amp; </span><span style="color:#0184bc;">cd</span><span> dynprocs_visualize
+</span></code></pre>
+<p>Run the <code>dynvis.py</code> script with the path to the log file:</p>
+<pre data-lang="bash" style="background-color:#fafafa;color:#383a42;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#e45649;">python3</span><span> ./dynvis.py path/to/log/file
+</span></code></pre>
+<p>This will create a rendered video at <code>media/videos/480p15/VisualizeDynProcs.mp4</code>.</p>
+<p>There exist some command line flags to tweak the behavior of DynVis:</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>usage: dynvis.py [-h] [--quality {low_quality,medium_quality,high_quality}] [--preview] [--round-to ROUND_TO] logfile
+</span><span>
+</span><span>positional arguments:
+</span><span>  logfile
+</span><span>
+</span><span>options:
+</span><span>  -h, --help            show this help message and exit
+</span><span>  --quality {low_quality,medium_quality,high_quality}, -q {low_quality,medium_quality,high_quality}
+</span><span>  --preview, -p
+</span><span>  --round-to ROUND_TO, -r ROUND_TO
+</span><span>                        On how many 10^r miliseconds to round the time to when aligning events
+</span><span>  --save_last_frame, -s
+</span><span>                        Save last frame as a picture
+</span></code></pre>
+<h3 id="example-output">Example Output</h3>
+<br/>
+<div class="embed-responsive embed-responsive-16by9">
+    <video class="embed-responsive" controls width="100%">
+        <source src="./VisualizeDynProcs.mp4" type="video/mp4">
+        Video Placeholder
+    </video>
+</div>
+<figcaption class="figure-caption" style="text-align: center; margin-bottom: 2em; margin-top: 1em">
+    Animated visualization of the <a href="https://github.com/boi4/dynprocs_visualize/blob/main/examples/libpfasst_run_parallel.csv">example log file</a>.
+</figcaption>
+<a href="./VisualizeDynProcs.png" target="_blank">
+<img class="img-fluid rounded mx-auto border" src="./VisualizeDynProcs.png">
+</a>
+<figcaption class="figure-caption" style="text-align: center; margin-bottom: 2em; margin-top: 1em">
+    Final result of the visualization
+</figcaption>
+<hr />
+<br/>
+<h2 id="mpi-modifier-scripts">MPI modifier scripts</h2>
+<p>I also created some bash scripts that can be simply prepended to the actual command ran by MPI.
+These bash scripts usually modify the output of each rank and can be helpful for debugging.
+They also work with dynamic Open MPI.</p>
+<p>For example instead of running:</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>mpirun -np 8 ./main.exe probin.nml
+</span></code></pre>
+<p>You run</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>mpirun -np 8 ./color_rank.sh ./main.exe probin.nml
+</span></code></pre>
+<p>to color the output of each process differently.</p>
+<p>The scripts can also be chained together:</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>mpirun -np 8 ./color_rank.sh ./prepend_rank.sh ./main.exe probin.nml
+</span></code></pre>
+<div style="overflow-x:auto;">
+<table><thead><tr><th>Script</th><th>Description</th></tr></thead><tbody>
+<tr><td><a href="https://fecht.cc/libpfasst-doc/tools/./color_rank.sh">color_rank.sh</a></td><td>Colors the output of each process based on its <code>$PMIX_RANK</code>.</td></tr>
+<tr><td><a href="https://fecht.cc/libpfasst-doc/tools/./env_wrapper.sh">env_wrapper.sh</a></td><td>Prints all environment variables of each process at the beginning.</td></tr>
+<tr><td><a href="https://fecht.cc/libpfasst-doc/tools/./ltrace_runs.sh">ltrace_run.sh</a></td><td>Uses <code>ltrace</code> to capture pset operation related MPI calls. Cannot be combined with GDB.</td></tr>
+<tr><td><a href="https://fecht.cc/libpfasst-doc/tools/./prepend_rank.sh">prepend_rank.sh</a></td><td>Prepends <code>$PMIX_RANK</code> to each line of the processes.</td></tr>
+<tr><td><a href="https://fecht.cc/libpfasst-doc/tools/./prepend_rank.sh">prepend_spacing.sh</a></td><td>Adds some amount of spacing based on <code>$PMIX_RANK</code> to each line of the processes. When making the terminal font very small, this can visualize the outputs of different ranks next to each other.</td></tr>
+</tbody></table>
+</div>
+<p><em>Note: You might need to chmod +x the scripts after downloading them to make them executable</em></p>
+
+      
+    </div>
+
+
+  </div> <!-- End of Container -->
+
+  <!-- Footer -->
+  <div class="container mb-3">
+    <div class="text-muted">TUM Interdisciplinary Project, Jan Fecht, 2023. pictures & videos: <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">CC BY 3.0</a>, code snippets: <a rel="license" href="https://opensource.org/license/mit/">MIT</a></div>
+  </div>
+
+  <script src="https://fecht.cc/libpfasst-doc/bootstrap.bundle-5.3.0.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"></script>
+  <script src="https://fecht.cc/libpfasst-doc/elasticlunr.min.js"></script>
+  <script src="https://fecht.cc/libpfasst-doc/search.js"></script>
+  <script>
+// initialize search
+if (document.readyState === "complete" ||
+    (document.readyState !== "loading" && !document.documentElement.doScroll)
+) {
+  initSearch("https://fecht.cc/libpfasst-doc/");
+} else {
+  document.addEventListener("DOMContentLoaded", () => {initSearch("https://fecht.cc/libpfasst-doc/")});
+}
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Showcase</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LibPFASST dynamic resources documentation" />
+  <meta name="keywords" content="HPC,Parallel-in-Time" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- bootstrap css -->
+  <link href="https://fecht.cc/libpfasst-doc/bootstrap-5.3.0.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+<style>
+/* flip the arrow when the content is collapsed */
+.collapsed .togglearrow {
+  transform: rotate(90deg);
+  display: inline-block;
+}
+.togglearrow {
+  transform: rotate(180deg);
+  color: black;
+  display: inline-block;
+}
+
+td {
+  padding: 0 15px;
+}
+th {
+  padding: 0 15px;
+}
+
+/* search results */
+.search-container {
+  display: inline-block;
+  position: relative;
+  width: 300px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.search-results {
+  display: none;
+  position: absolute;
+  background: white;
+  color: black;
+  padding: 1rem;
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.5);
+  max-height: 500px;
+  overflow: auto;
+  width: 150%;
+  right: 0;
+}
+
+/* Search results on mobile have 100% width*/
+@media (max-width: 767px) {
+  .search-results {
+    width: 100%;
+  }/* SM breakpoint */
+
+  /* CUSTOM WIDTHS */
+  .w-md-25 { width: 25%!important; }
+  .w-md-50 { width: 50%!important; }
+  .w-md-75 { width: 75%!important; }
+  .w-md-100 { width: 100%!important; }
+}
+
+.search-results__items {
+  list-style: none;
+}
+
+
+.search-results__items > li {
+  margin-top: 1rem;
+  border-bottom: 1px solid #ccc;
+  font-size: 0.9rem;
+
+}
+.search-results__items li:first-of-type {
+  margin-top: 0;
+}
+
+.search-results__item {
+  margin-bottom: 1rem;
+}
+
+.search-results__item > a {
+  font-size: 1.2rem;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+
+.text-muted > a {
+  color: var(--bs-secondary-color) !important;
+}
+
+</style>
+</head>
+
+<body>
+
+  <div class="container border pt-3 my-3">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light px-2" style="background-color: #e3f2fd;">
+
+      <a class="navbar-brand" href="https://fecht.cc/libpfasst-doc/">Dynamic LibPFASST</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/open-mpi/">Open MPI</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/libpfasst/">LibPFASST</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link active" href="https://fecht.cc/libpfasst-doc/showcase/">Showcase</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/tools/">Tools</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="https://fecht.cc/libpfasst-doc/libmpidynres/">libmpidynres</a>
+          </li>
+        </ul>
+
+
+        <div class="search-container navbar-form navbar-right mx-2">
+            <input id="search" type="search" placeholder="🔎 Search this site" aria-label="Search">
+
+            <div class="search-results">
+                <div class="search-results__items"></div>
+            </div>
+        </div>
+      </div> <!-- End of Collapse -->
+    </nav>
+
+    <!-- content -->
+    <div class="pt-3">
+      
+      <h1 id="showcase">Showcase</h1>
+<p>To show that dynamic LibPFASST works in more complex settings, dynamic resources are applied to a 2D heat equation solver that works both parallely in time and parallely in space.</p>
+<p>The original solver was part of the LibPFASST repository (<code>Examples/hypre</code>). This modified version is available separately on <a rel="noopener" target="_blank" href="https://github.com/boi4/showcase_dyn_libpfasst">Github</a>.</p>
+<p>The following video demonstrates how the heat equation is being solved and how process set operations are being used to dynamically grow and shrink the solver in the time dimension:</p>
+<div class="embed-responsive embed-responsive-16by9">
+    <video class="embed-responsive" controls width="100%">
+        <source src="./HeatEqu.mp4" type="video/mp4">
+        Video Placeholder
+    </video>
+</div>
+<figcaption class="figure-caption" style="text-align: center; margin-bottom: 2em; margin-top: 1em">
+    Animated visualization of LibPFASST solving the 2D Heat Equation. Demonstrates how growing and shrinking works in "space-parallel mode".
+</figcaption>
+<h2 id="introduction">Introduction</h2>
+<p>The heat equation is solved on a 2D square in the domain [0,π]x[0,π] with a zero boundary condition.
+The initial condition is described by the function <em>u(x,y,0) =  sin(x) + sin(y)</em> which creates a &quot;bump&quot; on the square domain.
+A closed form solution is given by <em>u(x,y,t) = exp(-2πt) (sin(x) + sin(y))</em>. This makes it possible to compute the error in the solution created by LibPFASST.</p>
+<p>Additionally to parallelizing in time using LibPFASST, the domain is split up in a grid wise manner.
+For example, the space domain can be split up into 4,9,16,... smaller squares.
+This is implemented by running 4,9,16,... parallel PFASST instances where the sweeper will use communication across the space domain to compute the time derivatives.</p>
+<p>In the non-dynamic case, this communication can be hidden transparently from LibPFASST.
+The main routine creates a grid out of <code>MPI_COMM_WORLD</code> using <code>MPI_Comm_split</code> so that each process is part of exactly one time and one space communicator.
+The time communicator is then used as the main LibPFASST communicator and the space communicator is used for solving the space component of the equation using the <a rel="noopener" target="_blank" href="https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods">HYPRE library</a>.</p>
+<h2 id="splitting-mpi-world-into-a-process-set-grid">Splitting mpi://WORLD into a process set grid</h2>
+<p>Because resize operations work on process sets, we cannot rely on <code>MPI_Comm_split</code> but instead need to split up the process sets directly.</p>
+<p>This is done in the following fashion (implemented in <code>create_pset_grid</code> in <code>src/comm.f90</code>):</p>
+<ol>
+<li>Split up &quot;mpi://WORLD&quot; into space process sets: space_psets = <strong>SPLIT(</strong> &quot;mpi://WORLD&quot;, &quot;ntime,ntime,...,ntime&quot; (nspace repetitions) <strong>)</strong></li>
+<li>Split up each space process set into single-process process sets: space_time_psets = <strong>SPLIT(</strong> space_pset[i], &quot;1,1,...,1&quot; (ntime repetitions) <strong>)</strong>, for i = 1,...,nspace</li>
+<li>Create time process sets by merging the right sing-process process sets: time_psets[i] = <strong>UNION(</strong> space_time_pset[i], space_time_psets[nspace+i], ..., space_time_psets[(ntime-1)nspace + i <strong>)</strong>, for i = 1,...,ntime</li>
+</ol>
+<p>Here we need the order preservation assumption for creating an consistent grid (the indexing in the third step must work).</p>
+<h2 id="space-parallel-mode-in-libpfasst">Space-parallel mode in LibPFASST</h2>
+<p>Because process set operations need global coordination, the fact that multiple PFASST instances are running in parallel cannot be transparently hidden from dynamic LibPFASST.</p>
+<p>Instead, LibPFASST requires additional information to be able to resize correctly.
+This way of running LibPFASST is called &quot;space-parallel mode&quot;.</p>
+<p>It can be enabled by passing additional <code>global_pset</code> and <code>horizontal_pset</code> to the <code>pf_dynprocs_create</code> routine.
+This will set the respective attributes of <code>pf%dynprocs</code> and create the respecive communicators.</p>
+<p>Furthermore, the resize operations become more complex. The logic is implemented in the following subroutines: <code>pf_dynprocs_create_comm</code> (for joining an existing run), <code>pf_dynprocs_handle_growth_global</code> (for shrinking by a number of time steps) and <code>pf_dynprocs_handle_shrink_global</code> (for growing by a number of time steps and establish communication with new processes).
+Again, we need the order preservation assumption for this to work and to keep grid consistency.
+These implement resizing in the following fashion (see also the video at the top):</p>
+<p><strong>Grow:</strong></p>
+<ol>
+<li>Create a <code>PSETOP_GROW</code> request with <code>ntime * num_new_timesteps</code> as the requested size.</li>
+<li>Wait for new global process set and delta process set to be returned by <code>MPI_Sessions_dyn_v2a_query_psetop</code>.</li>
+<li>Include the global process set name in the dict of the delta process set and finalize the process set operation.</li>
+<li>New processes: Create a process set grid from their &quot;mpi://WORLD&quot; (delta pset for the old processes)</li>
+<li>All processes: Create communicator from new global process set</li>
+<li>Rank 0 of each time process set of old and new processes: Send time process set name and space process set rank to global_rank 0.</li>
+<li>Rank 0 global communicator: Receive process set names for each space partition. Create unions from old and new time process sets and use the space rank for matching (so all processes in a time process set work on the same space domain). Send union process set names back to the respective processes.</li>
+<li>Rank 0 of each time process set of old and new processes: Broadcast new time process set name across time communicator</li>
+<li>All processes: Make new time process set the main process set of the LibPFASST run</li>
+</ol>
+<p><strong>Shrink:</strong></p>
+<ol>
+<li>Create a new delta process set with a <code>PSETOP_UNION</code> operation across the last <code>num_timesteps_to_remove</code> space process sets</li>
+<li>Create <code>nspace</code> <code>PSETOP_DIFF</code> operations for each time process set to get the new time process sets</li>
+<li>Create a <code>PSETOP_SHRINK</code> request with <code>ntime * num_timesteps_to_remove</code> as the requested size. Pass the delta process set as an argument, so the runtime only removes these processes.</li>
+<li>Wait for new global process set and delta process set to be returned by <code>MPI_Sessions_dyn_v2a_query_psetop</code>.</li>
+<li>If a process needs to shut down, exit the LibPFASST block loop</li>
+</ol>
+<h2 id="compilation-instructions">Compilation instructions</h2>
+<p><em>Note: If you have followed the instructions for the Docker build in the <a href="https://fecht.cc/libpfasst-doc/open-mpi/">Open MPI section</a>, the showcase was already cloned and compiled at <code>/opt/hpc/build/showcase_dyn_libpfasst</code>.</em></p>
+<p>To compile this program, make sure that you have built the dynamic version of LibPFASST that can be found <a rel="noopener" target="_blank" href="https://github.com/boi4/libpfasst">here</a>.</p>
+<p>Then run the following commands:</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span># clone the repository
+</span><span>git clone https://github.com/boi4/showcase_dyn_libpfasst.git &amp;&amp; cd showcase_dyn_libpfasst
+</span><span>
+</span><span># clone hypre
+</span><span>git clone git clone https://github.com/hypre-space/hypre.git
+</span><span>
+</span><span># build hypre
+</span><span>cd hypre/src &amp;&amp; ./configure --disable-fortran &amp;&amp; make -j &amp;&amp; cd ../..
+</span><span>
+</span><span># finally, compile this project
+</span><span>make LIBPFASST=/path/to/LibPFASST/
+</span></code></pre>
+<h2 id="usage">Usage</h2>
+<p>Please refer to the LibPFASST documentation to see what parameters you can set in probin.nml.</p>
+<p>The following additional parameters can control the run:</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>dump_values &lt;- logical, whether to dump solution values after each block
+</span><span>dump_dir    &lt;- string, where to dump the values to
+</span><span>nspace      &lt;- integer, number of processes per time step, must be a square number
+</span><span>T0          &lt;- float, t0
+</span><span>TFin        &lt;- float, tfin
+</span><span>nsteps      &lt;- integer, number of timesteps
+</span></code></pre>
+<p>Note that when nsteps/(TFin-T0) goes below some threshold (seems to be around ~1), the algorithm will become numerically unstable and a division by zero may appear.</p>
+<p>You can run the solver with the following command:</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>mpirun &lt;YOUR MPI RUN ARGUMENTS HERE&gt; ./main.exe probin.nml
+</span></code></pre>
+<p>Because of the resize granularity restriction of the runtime, make sure to have the number of processes per node be equal to the number of processes per time step (<code>nspace</code>).</p>
+<p>If you followed the Docker setup as described in the <a href="https://fecht.cc/libpfasst-doc/open-mpi/">Open MPI section</a>, you can pass the following arguments to mpirun (for nspace=4):</p>
+<pre style="background-color:#fafafa;color:#383a42;"><code><span>mpirun --mca btl_tcp_if_include eth0 --host n01:4,n02:4,n03:4,n04:4,n05:4,n06:4,n07:4,n08:4 -np 16 ./main.exe probin.nml
+</span></code></pre>
+
+      
+    </div>
+
+
+  </div> <!-- End of Container -->
+
+  <!-- Footer -->
+  <div class="container mb-3">
+    <div class="text-muted">TUM Interdisciplinary Project, Jan Fecht, 2023. pictures & videos: <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.en_US">CC BY 3.0</a>, code snippets: <a rel="license" href="https://opensource.org/license/mit/">MIT</a></div>
+  </div>
+
+  <script src="https://fecht.cc/libpfasst-doc/bootstrap.bundle-5.3.0.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"></script>
+  <script src="https://fecht.cc/libpfasst-doc/elasticlunr.min.js"></script>
+  <script src="https://fecht.cc/libpfasst-doc/search.js"></script>
+  <script>
+// initialize search
+if (document.readyState === "complete" ||
+    (document.readyState !== "loading" && !document.documentElement.doScroll)
+) {
+  initSearch("https://fecht.cc/libpfasst-doc/");
+} else {
+  document.addEventListener("DOMContentLoaded", () => {initSearch("https://fecht.cc/libpfasst-doc/")});
+}
+  </script>
+</body>
+
+</html>
